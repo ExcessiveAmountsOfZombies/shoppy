@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "shoppy",
+  "version": "${version}",
+  "name": "Shoppy",
+  "description": "Dedicated shop block mod for Fabric",
+  "authors": [
+    "Thonk"
+  ],
+  "contact": {},
+  "license": "LGPL-3.0",
+  "icon": "assets/shoppy/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "com.epherical.shoppy.client.ShoppyClient"
+    ],
+    "main": [
+      "com.epherical.shoppy.ShoppyMod"
+    ]
+  },
+  "mixins": [
+    "shoppy-fabric.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.12.11",
+    "fabric": "*",
+    "minecraft": ">=1.18.1",
+    "octo-economy-api": ">=1.0.0"
+  }
+}
