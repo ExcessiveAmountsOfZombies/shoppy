@@ -2,6 +2,7 @@ package com.epherical.shoppy.client.render;
 
 import com.epherical.shoppy.block.ShopBlock;
 import com.epherical.shoppy.block.ShopBlockEntity;
+import com.epherical.shoppy.client.ShoppyClient;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
 import net.fabricmc.api.EnvType;
@@ -12,11 +13,8 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemEntityRenderer;
-import net.minecraft.client.renderer.entity.ItemFrameRenderer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.item.ItemEntity;
 
 @Environment(EnvType.CLIENT)
@@ -46,8 +44,7 @@ public class ShopBlockRenderer implements BlockEntityRenderer<ShopBlockEntity> {
         poseStack.scale(0.60F, 0.60F, 0.60F);
         currencyItem.setItem(blockEntity.getSelling());
         if (currencyItem != null) {
-            ItemFrame
-            Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(currencyItem).render(currencyItem, f, increment, poseStack, multiBufferSource, i);
+            Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(currencyItem).render(currencyItem, f, ShoppyClient.tick, poseStack, multiBufferSource, i);
         }
         if (increment >= 360f) {
             increment = 0f;

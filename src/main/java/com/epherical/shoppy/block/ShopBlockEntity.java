@@ -10,6 +10,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,16 +24,18 @@ public class ShopBlockEntity extends BlockEntity implements Clearable {
     private UUID owner = Util.NIL_UUID;
     private ItemStack currency;
     private ItemStack selling;
-    private NonNullList<ItemStack> currencyStorage;
-    private NonNullList<ItemStack> itemStorage;
+    private int currencyStored;
+    private int itemsStored;
+    private int maxStorage;
 
 
     public ShopBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(ShoppyMod.SHOP_BLOCK_ENTITY, blockPos, blockState);
         this.currency = ItemStack.EMPTY;
         this.selling = ItemStack.EMPTY;
-        this.currencyStorage = NonNullList.withSize(27, ItemStack.EMPTY);
-        this.itemStorage = NonNullList.withSize(54, ItemStack.EMPTY);
+        this.currencyStored = 0;
+        this.itemsStored = 0;
+        this.maxStorage = 54 * 64;
     }
 
     @Override
@@ -42,7 +45,9 @@ public class ShopBlockEntity extends BlockEntity implements Clearable {
         this.owner = compoundTag.getUUID("owner");
         this.currency = ItemStack.of(compoundTag.getCompound("currency"));
         this.selling = ItemStack.of(compoundTag.getCompound("selling"));
-        ContainerHelper.loadAllItems(compoundTag, currencyStorage);
+        this.currencyStored = compoundTag.getInt("storedCurrency");
+        this.itemsStored = compoundTag.getInt("storedItems");
+        this.maxStorage = compoundTag.getInt("maxStorage");
     }
 
     @Override
@@ -50,17 +55,19 @@ public class ShopBlockEntity extends BlockEntity implements Clearable {
         super.saveAdditional(compoundTag);
         compoundTag.putInt("transactions", transactions);
         compoundTag.putUUID("owner", owner);
-        ContainerHelper.saveAllItems(compoundTag, currencyStorage, true);
         compoundTag.put("currency", currency.save(new CompoundTag()));
         compoundTag.put("selling", selling.save(new CompoundTag()));
+        compoundTag.putInt("storedCurrency", currencyStored);
+        compoundTag.putInt("storedItems", itemsStored);
+        compoundTag.putInt("maxStorage", maxStorage);
     }
 
     @Override
     public void clearContent() {
         currency = ItemStack.EMPTY;
         selling = ItemStack.EMPTY;
-        currencyStorage.clear();
-        itemStorage.clear();
+        itemsStored = 0;
+        currencyStored = 0;
     }
 
 
@@ -92,6 +99,75 @@ public class ShopBlockEntity extends BlockEntity implements Clearable {
     public void addCurrencyItem(ItemStack item) {
         this.currency = item;
         markUpdated();
+    }
+
+    public void setOwner(UUID owner) {
+        this.owner = owner;
+    }
+
+    public UUID getOwner() {
+        return owner;
+    }
+
+    public int putItemIntoShop(boolean isCurrency, ItemStack item) {
+        if (!item.isEmpty()) {
+            if (!isCurrency) {
+                if (this.itemsStored > maxStorage) {
+                    return 0;
+                }
+
+                int itemsInserted = Math.min(item.getCount(), remainingItemStorage());
+
+                this.itemsStored += itemsInserted;
+                item.shrink(itemsInserted);
+
+                return itemsInserted;
+            }
+        }
+        return 0;
+    }
+
+    public NonNullList<ItemStack> dropItems() {
+        NonNullList<ItemStack> list = NonNullList.create();
+        int currency = this.currencyStored;
+
+        while (currency != 0) {
+            ItemStack copy = this.currency.copy();
+            if (currency >= 64) {
+                copy.setCount(64);
+                list.add(copy);
+                currency -= 64;
+            } else {
+                copy.setCount(currency);
+                list.add(copy);
+                currency -= currency;
+            }
+        }
+
+        int itemsStored = this.itemsStored;
+
+        while (itemsStored != 0) {
+            ItemStack copy = this.selling.copy();
+            if (itemsStored >= 64) {
+                copy.setCount(64);
+                list.add(copy);
+                itemsStored -= 64;
+            } else {
+                copy.setCount(itemsStored);
+                list.add(copy);
+                itemsStored -= itemsStored;
+            }
+        }
+
+        return list;
+    }
+
+    public int remainingCurrencySpaces() {
+        return maxStorage - currencyStored;
+    }
+
+    public int remainingItemStorage() {
+        return maxStorage - itemsStored;
     }
 
     public ItemStack getCurrency() {
