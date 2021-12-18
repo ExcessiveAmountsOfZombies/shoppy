@@ -5,6 +5,8 @@ import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -12,6 +14,7 @@ import net.minecraft.world.Clearable;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -109,6 +112,37 @@ public class ShopBlockEntity extends BlockEntity implements Clearable {
         return owner;
     }
 
+    public boolean attemptPurchase(Player player, ItemStack currencyInHand) {
+        if (ItemStack.isSameItemSameTags(currencyInHand, currency)) {
+            int price = currency.getCount();
+            if (currencyInHand.getCount() >= price) {
+                int amountToGive = selling.getCount();
+                if (amountToGive > itemsStored) {
+                    // todo: send message to owner AND player about shop being empty.
+                    System.out.println("shop empty bro");
+                    return false;
+                } else if (remainingCurrencySpaces() <= 0) {
+                    System.out.println("you aint got money bro");
+                    // todo: notify that currency storage is full
+                    return false;
+                } else {
+                    currencyInHand.shrink(price);
+                    player.addItem(selling.copy());
+                    System.out.println("it's all urs bro");
+                    return true;
+                }
+
+                // give the player the item
+            } else {
+                // send message about not having enough MONAUY
+                return false;
+            }
+        } else {
+            Component component = new TranslatableComponent("It looks like you don't have the necessary items to purchase from the shop! Make sure you're holding the item.");
+        }
+        return false;
+    }
+
     public int putItemIntoShop(boolean isCurrency, ItemStack item) {
         if (!item.isEmpty()) {
             if (!isCurrency) {
@@ -176,5 +210,32 @@ public class ShopBlockEntity extends BlockEntity implements Clearable {
 
     public ItemStack getSelling() {
         return selling;
+    }
+
+    public void sendInformationToOwner(Player player) {
+        // todo: lang
+        Component component = new TranslatableComponent("To extract your profits, crouch while punching the chest. After the profits are extracted," +
+                " items can be removed by doing the same action.");
+        player.sendMessage(component, Util.NIL_UUID);
+        Component profits = new TranslatableComponent("This shop contains %s item(s) in profits", currencyStored);
+        Component toBeSold = new TranslatableComponent("and %s items to be sold", itemsStored);
+        player.sendMessage(profits, Util.NIL_UUID);
+        player.sendMessage(toBeSold, Util.NIL_UUID);
+    }
+    public void extractItemsFromShop(Level level, BlockPos pos) {
+        // extract money first
+        if (remainingCurrencySpaces() != maxStorage) {
+            int itemsToTake = Math.min(64, currencyStored);
+            ItemStack currency = getCurrency().copy();
+            currency.setCount(itemsToTake);
+            ShopBlock.popResource(level, pos, currency);
+            currencyStored -= itemsToTake;
+        } else {
+            int itemsToTake = Math.min(64, itemsStored);
+            ItemStack selling = getSelling().copy();
+            selling.setCount(itemsToTake);
+            ShopBlock.popResource(level, pos, selling);
+            itemsStored -= itemsToTake;
+        }
     }
 }

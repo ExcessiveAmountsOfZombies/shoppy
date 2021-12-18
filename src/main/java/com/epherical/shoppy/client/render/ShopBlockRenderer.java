@@ -63,6 +63,7 @@ public class ShopBlockRenderer implements BlockEntityRenderer<ShopBlockEntity> {
         poseStack.mulPose(Vector3f.XP.rotation(22.4f));
         poseStack.mulPose(Vector3f.ZP.rotation(22f));
 
+        // todo: LANG (SCOTT)
         this.font.drawInBatch("selling x" + blockEntity.getSelling().getCount(), 0, 0, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
         this.font.drawInBatch("for", 20,14,0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
         String money = "" + blockEntity.getCurrency().getCount();

@@ -5,6 +5,11 @@ import net.fabricmc.fabric.impl.event.interaction.InteractionEventsRouter;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.KeybindComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
@@ -13,10 +18,14 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.FurnaceBlock;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
@@ -68,34 +77,68 @@ public class ShopBlock extends Block implements EntityBlock {
         ItemStack item = player.getMainHandItem();
         ShopBlockEntity shopBlock = level.getBlockEntity(blockPos, ShoppyMod.SHOP_BLOCK_ENTITY).orElse(null);
 
-        if (shopBlock != null && (shopBlock.getOwner().equals(player.getUUID()) || player.hasPermissions(4)) && !level.isClientSide) {
-            if (player.isShiftKeyDown()) {
-                Containers.dropContents(level, blockPos, shopBlock.dropItems());
-                shopBlock.addCurrencyItem(ItemStack.EMPTY);
-                shopBlock.addSellingItem(ItemStack.EMPTY);
-                return InteractionResult.SUCCESS;
-            } else if (hit.y() <= 0.5 && shopBlock.getCurrency().isEmpty()) {
-                shopBlock.addCurrencyItem(item.copy());
-                return InteractionResult.SUCCESS;
-            } else if (hit.y() > 0.5) {
-                if (shopBlock.getSelling().isEmpty()) {
-                    shopBlock.addSellingItem(item.copy());
-                } else if (ItemStack.isSameItemSameTags(item, shopBlock.getSelling())) {
-                    shopBlock.putItemIntoShop(false, item);
-                }
+        if (shopBlock != null) {
+            if ((shopBlock.getOwner().equals(player.getUUID())/* || player.hasPermissions(4)*/) && !level.isClientSide) {
+                if (player.isShiftKeyDown()) {
+                    Containers.dropContents(level, blockPos, shopBlock.dropItems());
+                    shopBlock.addCurrencyItem(ItemStack.EMPTY);
+                    shopBlock.addSellingItem(ItemStack.EMPTY);
+                    return InteractionResult.SUCCESS;
+                } else if (hit.y() <= 0.5 && shopBlock.getCurrency().isEmpty()) {
+                    shopBlock.addCurrencyItem(item.copy());
+                    return InteractionResult.SUCCESS;
+                } else if (hit.y() > 0.5) {
+                    if (shopBlock.getSelling().isEmpty()) {
+                        shopBlock.addSellingItem(item.copy());
+                    } else if (ItemStack.isSameItemSameTags(item, shopBlock.getSelling())) {
+                        shopBlock.putItemIntoShop(false, item);
+                    }
 
-                return InteractionResult.SUCCESS;
+                    return InteractionResult.SUCCESS;
+                }
+                return InteractionResult.CONSUME;
+            } else {
+                if (!level.isClientSide) {
+                    shopBlock.attemptPurchase(player, item);
+                }
             }
-            return InteractionResult.CONSUME;
-        } else {
-            // someone purchasing
         }
 
         return InteractionResult.CONSUME;
     }
 
+    /**
+     * We will use this method to display information to the owner of the shop or a potential buyer.
+     */
     @Override
     public void attack(BlockState blockState, Level level, BlockPos blockPos, Player player) {
+        ShopBlockEntity shopBlock = level.getBlockEntity(blockPos, ShoppyMod.SHOP_BLOCK_ENTITY).orElse(null);
+
+        if (shopBlock != null && !level.isClientSide) {
+            // owner
+            if (shopBlock.getOwner().equals(player.getUUID())) {
+                if (player.isShiftKeyDown()) {
+                    shopBlock.extractItemsFromShop(level, blockPos);
+                } else {
+                    shopBlock.sendInformationToOwner(player);
+                }
+            } else {
+                // send message to player about what is being sold for and what must be given
+                Component amountBeingSold = new TextComponent("" + shopBlock.getSelling().getCount());
+                Component itemBeingSold = shopBlock.getSelling().getDisplayName().copy().withStyle(style -> {
+                    style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(shopBlock.getSelling())));
+                    return style;
+                });
+                Component currencyAmount = new TextComponent("" + shopBlock.getCurrency().getCount());
+                Component itemBeingTraded = shopBlock.getCurrency().getDisplayName().copy().withStyle(style -> {
+                    style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(shopBlock.getCurrency())));
+                    return style;
+                });
+                // todo: lang
+                Component component = new TranslatableComponent("This shop is selling x%s %s for x%s %s.", amountBeingSold, itemBeingSold, currencyAmount, itemBeingTraded);
+                player.sendMessage(component, Util.NIL_UUID);
+            }
+        }
         super.attack(blockState, level, blockPos, player);
     }
 
@@ -122,6 +165,12 @@ public class ShopBlock extends Block implements EntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
+    }
+
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext blockPlaceContext) {
+        return this.defaultBlockState().setValue(FACING, blockPlaceContext.getHorizontalDirection());
     }
 
     @Nullable
