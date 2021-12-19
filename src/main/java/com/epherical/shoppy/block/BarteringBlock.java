@@ -1,17 +1,13 @@
 package com.epherical.shoppy.block;
 
 import com.epherical.shoppy.ShoppyMod;
-import net.fabricmc.fabric.impl.event.interaction.InteractionEventsRouter;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.KeybindComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -21,17 +17,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.FurnaceBlock;
-import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.HopperBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -45,14 +36,14 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 
-public class ShopBlock extends Block implements EntityBlock {
+public class BarteringBlock extends Block implements EntityBlock {
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     protected static final VoxelShape BASE = Block.box(0.0D, 0.0D, 0.0D, 16.0D, 8.0D, 16.0D);
     protected static final VoxelShape GLASS_BOX = Block.box(3.0D, 8.0D, 3.0D, 13.0D, 16.0D, 13.0D);
     protected static final VoxelShape SHAPE = Shapes.or(BASE, GLASS_BOX);
 
-    public ShopBlock(Properties properties) {
+    public BarteringBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH));
     }
@@ -75,21 +66,23 @@ public class ShopBlock extends Block implements EntityBlock {
     public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         Vec3 hit = blockHitResult.getLocation().subtract(Vec3.atLowerCornerOf(blockPos));
         ItemStack item = player.getMainHandItem();
-        ShopBlockEntity shopBlock = level.getBlockEntity(blockPos, ShoppyMod.SHOP_BLOCK_ENTITY).orElse(null);
+        BarteringBlockEntity shopBlock = level.getBlockEntity(blockPos, ShoppyMod.BARTING_STATION_ENTITY).orElse(null);
 
         if (shopBlock != null) {
             if ((shopBlock.getOwner().equals(player.getUUID())/* || player.hasPermissions(4)*/) && !level.isClientSide) {
                 if (player.isShiftKeyDown()) {
-                    Containers.dropContents(level, blockPos, shopBlock.dropItems());
-                    shopBlock.addCurrencyItem(ItemStack.EMPTY);
-                    shopBlock.addSellingItem(ItemStack.EMPTY);
+                    shopBlock.clearShop();
                     return InteractionResult.SUCCESS;
                 } else if (hit.y() <= 0.5 && shopBlock.getCurrency().isEmpty()) {
                     shopBlock.addCurrencyItem(item.copy());
+                    Component setup = new TranslatableComponent("barter.setup.owner.add_currency", item.getDisplayName()).setStyle(ShoppyMod.CONSTANTS_STYLE);
+                    player.sendMessage(setup, Util.NIL_UUID);
                     return InteractionResult.SUCCESS;
                 } else if (hit.y() > 0.5) {
                     if (shopBlock.getSelling().isEmpty()) {
                         shopBlock.addSellingItem(item.copy());
+                        Component setup = new TranslatableComponent("barter.setup.owner.add_selling", item.getDisplayName()).setStyle(ShoppyMod.CONSTANTS_STYLE);
+                        player.sendMessage(setup, Util.NIL_UUID);
                     } else if (ItemStack.isSameItemSameTags(item, shopBlock.getSelling())) {
                         shopBlock.putItemIntoShop(false, item);
                     }
@@ -98,7 +91,7 @@ public class ShopBlock extends Block implements EntityBlock {
                 }
                 return InteractionResult.CONSUME;
             } else {
-                if (!level.isClientSide) {
+                if (!level.isClientSide && !shopBlock.getSelling().isEmpty()) {
                     shopBlock.attemptPurchase(player, item);
                 }
             }
@@ -112,7 +105,7 @@ public class ShopBlock extends Block implements EntityBlock {
      */
     @Override
     public void attack(BlockState blockState, Level level, BlockPos blockPos, Player player) {
-        ShopBlockEntity shopBlock = level.getBlockEntity(blockPos, ShoppyMod.SHOP_BLOCK_ENTITY).orElse(null);
+        BarteringBlockEntity shopBlock = level.getBlockEntity(blockPos, ShoppyMod.BARTING_STATION_ENTITY).orElse(null);
 
         if (shopBlock != null && !level.isClientSide) {
             // owner
@@ -124,18 +117,18 @@ public class ShopBlock extends Block implements EntityBlock {
                 }
             } else {
                 // send message to player about what is being sold for and what must be given
-                Component amountBeingSold = new TextComponent("" + shopBlock.getSelling().getCount());
+                Component amountBeingSold = new TextComponent("x" + shopBlock.getSelling().getCount()).setStyle(ShoppyMod.VARIABLE_STYLE);
                 Component itemBeingSold = shopBlock.getSelling().getDisplayName().copy().withStyle(style -> {
                     style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(shopBlock.getSelling())));
                     return style;
                 });
-                Component currencyAmount = new TextComponent("" + shopBlock.getCurrency().getCount());
+                Component currencyAmount = new TextComponent("x" + shopBlock.getCurrency().getCount()).setStyle(ShoppyMod.VARIABLE_STYLE);
                 Component itemBeingTraded = shopBlock.getCurrency().getDisplayName().copy().withStyle(style -> {
                     style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(shopBlock.getCurrency())));
                     return style;
                 });
-                // todo: lang
-                Component component = new TranslatableComponent("This shop is selling x%s %s for x%s %s.", amountBeingSold, itemBeingSold, currencyAmount, itemBeingTraded);
+
+                Component component = new TranslatableComponent("barter.information.user.selling_info", amountBeingSold, itemBeingSold, currencyAmount, itemBeingTraded).setStyle(ShoppyMod.CONSTANTS_STYLE);
                 player.sendMessage(component, Util.NIL_UUID);
             }
         }
@@ -146,8 +139,8 @@ public class ShopBlock extends Block implements EntityBlock {
     public void onRemove(BlockState blockState, Level level, BlockPos blockPos, BlockState blockState2, boolean bl) {
         if (!blockState.is(blockState2.getBlock())) {
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
-            if (blockEntity instanceof ShopBlockEntity) {
-                Containers.dropContents(level, blockPos, ((ShopBlockEntity) blockEntity).dropItems());
+            if (blockEntity instanceof BarteringBlockEntity) {
+                Containers.dropContents(level, blockPos, ((BarteringBlockEntity) blockEntity).dropItems());
             }
         }
         super.onRemove(blockState, level, blockPos, blockState2, bl);
@@ -156,7 +149,7 @@ public class ShopBlock extends Block implements EntityBlock {
     @Override
     public void setPlacedBy(Level level, BlockPos blockPos, BlockState blockState, @Nullable LivingEntity livingEntity, ItemStack itemStack) {
         if (livingEntity != null) {
-            ShopBlockEntity shop = (ShopBlockEntity) level.getBlockEntity(blockPos);
+            BarteringBlockEntity shop = (BarteringBlockEntity) level.getBlockEntity(blockPos);
             shop.setOwner(livingEntity.getUUID());
         }
         super.setPlacedBy(level, blockPos, blockState, livingEntity, itemStack);
@@ -176,7 +169,7 @@ public class ShopBlock extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new ShopBlockEntity(blockPos, blockState);
+        return new BarteringBlockEntity(blockPos, blockState);
     }
 
     @Override

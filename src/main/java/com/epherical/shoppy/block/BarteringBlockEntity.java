@@ -6,12 +6,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Clearable;
-import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -21,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class ShopBlockEntity extends BlockEntity implements Clearable {
+public class BarteringBlockEntity extends BlockEntity implements Clearable {
 
     private int transactions;
     private UUID owner = Util.NIL_UUID;
@@ -32,8 +33,8 @@ public class ShopBlockEntity extends BlockEntity implements Clearable {
     private int maxStorage;
 
 
-    public ShopBlockEntity(BlockPos blockPos, BlockState blockState) {
-        super(ShoppyMod.SHOP_BLOCK_ENTITY, blockPos, blockState);
+    public BarteringBlockEntity(BlockPos blockPos, BlockState blockState) {
+        super(ShoppyMod.BARTING_STATION_ENTITY, blockPos, blockState);
         this.currency = ItemStack.EMPTY;
         this.selling = ItemStack.EMPTY;
         this.currencyStored = 0;
@@ -104,6 +105,15 @@ public class ShopBlockEntity extends BlockEntity implements Clearable {
         markUpdated();
     }
 
+    public void clearShop() {
+        Containers.dropContents(level, getBlockPos(), dropItems());
+        this.selling = ItemStack.EMPTY;
+        this.currency = ItemStack.EMPTY;
+        this.currencyStored = 0;
+        this.itemsStored = 0;
+        markUpdated();
+    }
+
     public void setOwner(UUID owner) {
         this.owner = owner;
     }
@@ -113,32 +123,54 @@ public class ShopBlockEntity extends BlockEntity implements Clearable {
     }
 
     public boolean attemptPurchase(Player player, ItemStack currencyInHand) {
+        Player owner = level.getServer().getPlayerList().getPlayer(this.owner);
         if (ItemStack.isSameItemSameTags(currencyInHand, currency)) {
             int price = currency.getCount();
             if (currencyInHand.getCount() >= price) {
                 int amountToGive = selling.getCount();
                 if (amountToGive > itemsStored) {
-                    // todo: send message to owner AND player about shop being empty.
-                    System.out.println("shop empty bro");
-                    return false;
+                    Component buyerMsg = new TranslatableComponent("barter.purchase.shop_empty").setStyle(ShoppyMod.ERROR_STYLE);
+                    player.sendMessage(buyerMsg, Util.NIL_UUID);
+                    if (owner != null) {
+                        Component location = new TranslatableComponent("X: %s, Y: %s, Z: %s", getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ()).setStyle(ShoppyMod.VARIABLE_STYLE);
+                        Component ownerMsg = new TranslatableComponent("barter.purchase.owner.shop_empty", location).setStyle(ShoppyMod.CONSTANTS_STYLE);
+                        owner.sendMessage(ownerMsg, Util.NIL_UUID);
+                    }
                 } else if (remainingCurrencySpaces() <= 0) {
-                    System.out.println("you aint got money bro");
-                    // todo: notify that currency storage is full
-                    return false;
+                    Component buyerMsg = new TranslatableComponent("barter.purchase.currency_full", currency.getDisplayName()).setStyle(ShoppyMod.ERROR_STYLE);
+                    player.sendMessage(buyerMsg, Util.NIL_UUID);
+                    if (owner != null) {
+                        Component location = new TranslatableComponent("X: %s, Y: %s, Z: %s", getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ()).setStyle(ShoppyMod.VARIABLE_STYLE);
+                        Component ownerMsg = new TranslatableComponent("barter.purchase.owner.currency_full", location).setStyle(ShoppyMod.CONSTANTS_STYLE);
+                        owner.sendMessage(ownerMsg, Util.NIL_UUID);
+                    }
+                } else if (player.getInventory().getFreeSlot() == -1) {
+                    Component component = new TranslatableComponent("common.purchase.full_inventory").setStyle(ShoppyMod.ERROR_STYLE);
+                    player.sendMessage(component, Util.NIL_UUID);
                 } else {
                     currencyInHand.shrink(price);
                     player.addItem(selling.copy());
-                    System.out.println("it's all urs bro");
+                    Component buyer = new TranslatableComponent("barter.purchase.transaction_success", selling.getDisplayName()).setStyle(ShoppyMod.APPROVAL_STYLE);
+                    player.sendMessage(buyer, Util.NIL_UUID);
+
+                    if (owner != null) {
+                        Component sellerMsg = new TranslatableComponent("barter.purchase.owner.transaction_success", player.getDisplayName(), selling.getDisplayName()).setStyle(ShoppyMod.APPROVAL_STYLE);
+                        player.sendMessage(sellerMsg, Util.NIL_UUID);
+                    }
                     return true;
                 }
-
-                // give the player the item
             } else {
-                // send message about not having enough MONAUY
-                return false;
+                Component required = new TextComponent("x" + price).setStyle(ShoppyMod.VARIABLE_STYLE);
+                Component had = new TextComponent("x" + currencyInHand.getCount()).setStyle(ShoppyMod.VARIABLE_STYLE);
+                TranslatableComponent component = new TranslatableComponent("barter.purchase.not_enough_items", required, had);
+                component.setStyle(ShoppyMod.ERROR_STYLE);
+                player.sendMessage(component, Util.NIL_UUID);
             }
+            return false;
         } else {
-            Component component = new TranslatableComponent("It looks like you don't have the necessary items to purchase from the shop! Make sure you're holding the item.");
+            TranslatableComponent component = new TranslatableComponent("barter.purchase.no_held_item");
+            component.setStyle(ShoppyMod.ERROR_STYLE);
+            player.sendMessage(component, Util.NIL_UUID);
         }
         return false;
     }
@@ -213,13 +245,13 @@ public class ShopBlockEntity extends BlockEntity implements Clearable {
     }
 
     public void sendInformationToOwner(Player player) {
-        // todo: lang
-        Component component = new TranslatableComponent("To extract your profits, crouch while punching the chest. After the profits are extracted," +
-                " items can be removed by doing the same action.");
+        Component component = new TranslatableComponent("barter.information.owner.extraction").setStyle(ShoppyMod.CONSTANTS_STYLE);
         player.sendMessage(component, Util.NIL_UUID);
-        Component profits = new TranslatableComponent("This shop contains %s item(s) in profits", currencyStored);
-        Component toBeSold = new TranslatableComponent("and %s items to be sold", itemsStored);
-        player.sendMessage(profits, Util.NIL_UUID);
+        Component profits = new TextComponent("" + currencyStored).setStyle(ShoppyMod.VARIABLE_STYLE);
+        Component translatedProfits = new TranslatableComponent("barter.information.owner.profits", profits).setStyle(ShoppyMod.CONSTANTS_STYLE);
+        Component storedItems = new TextComponent("" + itemsStored).setStyle(ShoppyMod.VARIABLE_STYLE);
+        Component toBeSold = new TranslatableComponent("barter.information.owner.barter", storedItems).setStyle(ShoppyMod.CONSTANTS_STYLE);
+        player.sendMessage(translatedProfits, Util.NIL_UUID);
         player.sendMessage(toBeSold, Util.NIL_UUID);
     }
     public void extractItemsFromShop(Level level, BlockPos pos) {
@@ -228,13 +260,13 @@ public class ShopBlockEntity extends BlockEntity implements Clearable {
             int itemsToTake = Math.min(64, currencyStored);
             ItemStack currency = getCurrency().copy();
             currency.setCount(itemsToTake);
-            ShopBlock.popResource(level, pos, currency);
+            BarteringBlock.popResource(level, pos, currency);
             currencyStored -= itemsToTake;
         } else {
             int itemsToTake = Math.min(64, itemsStored);
             ItemStack selling = getSelling().copy();
             selling.setCount(itemsToTake);
-            ShopBlock.popResource(level, pos, selling);
+            BarteringBlock.popResource(level, pos, selling);
             itemsStored -= itemsToTake;
         }
     }

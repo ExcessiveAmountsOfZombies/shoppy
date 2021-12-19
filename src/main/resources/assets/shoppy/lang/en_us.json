@@ -1,0 +1,26 @@
+{
+  "itemGroup.shoppy.shoppy": "Shoppy",
+
+  "block.shoppy.shop_block": "Shop Block",
+
+  "barter.purchase.no_held_item": "It looks like you don't have the necessary items to barter from the shop. Make sure you're holding the item.",
+  "barter.purchase.not_enough_items": "You do not have enough items to complete the barter. (Requires: %s, had: %s)",
+  "barter.purchase.transaction_success": "You have purchased %s.",
+  "barter.purchase.owner.transaction_success": "%s purchased %s from your bartering station.",
+  "barter.purchase.shop_empty": "This bartering station is empty.",
+  "barter.purchase.owner.shop_empty": "Your bartering station at %s is empty.",
+  "barter.purchase.currency_full": "You can not buy from this bartering station as it can not store any more %s.",
+  "barter.purchase.owner.currency_full": "Your bartering station at %s is full of %s and can not be traded with any more.",
+
+  "barter.information.owner.extraction": "To extract your profits, crouch while punching the chest. After the profits are extracted, items can be removed by doing the same action.",
+  "barter.information.owner.profits": "This shop contains %s item(s) in profit.",
+  "barter.information.owner.barter": "and %s items to be sold.",
+
+  "barter.information.user.selling_info": "This shop is selling %s %s for %s %s.",
+
+  "barter.setup.owner.add_currency": "Set currency to %s at this barter station. To clear, crouch and right click the station. This will also drop any items currently stored in the station.",
+  "barter.setup.owner.add_selling": "Set selling to %s at this barter station. To clear, crouch and right click the station. This will also drop any items currently stored in the station.",
+
+
+  "common.purchase.full_inventory": "You can not trade when your inventory is full."
+}

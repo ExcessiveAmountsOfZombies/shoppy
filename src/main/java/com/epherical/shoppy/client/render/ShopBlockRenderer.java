@@ -1,7 +1,7 @@
 package com.epherical.shoppy.client.render;
 
-import com.epherical.shoppy.block.ShopBlock;
-import com.epherical.shoppy.block.ShopBlockEntity;
+import com.epherical.shoppy.block.BarteringBlock;
+import com.epherical.shoppy.block.BarteringBlockEntity;
 import com.epherical.shoppy.client.ShoppyClient;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
@@ -18,7 +18,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
 
 @Environment(EnvType.CLIENT)
-public class ShopBlockRenderer implements BlockEntityRenderer<ShopBlockEntity> {
+public class ShopBlockRenderer implements BlockEntityRenderer<BarteringBlockEntity> {
 
     private final ItemRenderer renderer;
     private final Font font;
@@ -31,8 +31,8 @@ public class ShopBlockRenderer implements BlockEntityRenderer<ShopBlockEntity> {
     }
 
     @Override
-    public void render(ShopBlockEntity blockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, int j) {
-        Direction direction = blockEntity.getBlockState().getValue(ShopBlock.FACING);
+    public void render(BarteringBlockEntity blockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, int j) {
+        Direction direction = blockEntity.getBlockState().getValue(BarteringBlock.FACING);
         if (currencyItem == null) {
             currencyItem = new ItemEntity(blockEntity.getLevel(), blockEntity.getBlockPos().getX(), blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ(), blockEntity.getSelling());
         }

@@ -23,7 +23,7 @@ public class ShoppyClient implements ClientModInitializer {
                 tick = Integer.MIN_VALUE;
             }
         });
-        BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.SHOP_BLOCK, RenderType.cutout());
-        BlockEntityRendererRegistry.register(ShoppyMod.SHOP_BLOCK_ENTITY, ShopBlockRenderer::new);
+        BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.BARTERING_STATION, RenderType.cutout());
+        BlockEntityRendererRegistry.register(ShoppyMod.BARTING_STATION_ENTITY, ShopBlockRenderer::new);
     }
 }
