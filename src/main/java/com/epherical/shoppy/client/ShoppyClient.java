@@ -1,7 +1,7 @@
 package com.epherical.shoppy.client;
 
 import com.epherical.shoppy.ShoppyMod;
-import com.epherical.shoppy.client.render.ShopBlockRenderer;
+import com.epherical.shoppy.client.render.BarteringBlockRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -24,6 +24,6 @@ public class ShoppyClient implements ClientModInitializer {
             }
         });
         BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.BARTERING_STATION, RenderType.cutout());
-        BlockEntityRendererRegistry.register(ShoppyMod.BARTING_STATION_ENTITY, ShopBlockRenderer::new);
+        BlockEntityRendererRegistry.register(ShoppyMod.BARTING_STATION_ENTITY, BarteringBlockRenderer::new);
     }
 }

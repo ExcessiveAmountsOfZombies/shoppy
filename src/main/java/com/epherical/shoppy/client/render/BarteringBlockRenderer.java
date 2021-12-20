@@ -1,7 +1,7 @@
 package com.epherical.shoppy.client.render;
 
-import com.epherical.shoppy.block.BarteringBlock;
-import com.epherical.shoppy.block.BarteringBlockEntity;
+import com.epherical.shoppy.block.AbstractTradingBlock;
+import com.epherical.shoppy.block.entity.BarteringBlockEntity;
 import com.epherical.shoppy.client.ShoppyClient;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
@@ -18,36 +18,31 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
 
 @Environment(EnvType.CLIENT)
-public class ShopBlockRenderer implements BlockEntityRenderer<BarteringBlockEntity> {
+public class BarteringBlockRenderer implements BlockEntityRenderer<BarteringBlockEntity> {
 
     private final ItemRenderer renderer;
     private final Font font;
-    private ItemEntity currencyItem;
-    private float increment;
+    private ItemEntity sellingItem;
 
-    public ShopBlockRenderer(BlockEntityRendererProvider.Context context) {
+    public BarteringBlockRenderer(BlockEntityRendererProvider.Context context) {
         this.renderer = Minecraft.getInstance().getItemRenderer();
         this.font = context.getFont();
     }
 
     @Override
     public void render(BarteringBlockEntity blockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, int j) {
-        Direction direction = blockEntity.getBlockState().getValue(BarteringBlock.FACING);
-        if (currencyItem == null) {
-            currencyItem = new ItemEntity(blockEntity.getLevel(), blockEntity.getBlockPos().getX(), blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ(), blockEntity.getSelling());
+        Direction direction = blockEntity.getBlockState().getValue(AbstractTradingBlock.FACING);
+        if (sellingItem == null) {
+            sellingItem = new ItemEntity(blockEntity.getLevel(), blockEntity.getBlockPos().getX(), blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ(), blockEntity.getSelling());
         }
         int k = (int)blockEntity.getBlockPos().asLong();
-        increment += 0.1;
         poseStack.pushPose();
         poseStack.translate(0.5D, 0.55D, 0.5D);
         poseStack.mulPose(Vector3f.YP.rotationDegrees(-direction.toYRot()));
         poseStack.scale(0.60F, 0.60F, 0.60F);
-        currencyItem.setItem(blockEntity.getSelling());
-        if (currencyItem != null) {
-            Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(currencyItem).render(currencyItem, f, ShoppyClient.tick, poseStack, multiBufferSource, i);
-        }
-        if (increment >= 360f) {
-            increment = 0f;
+        sellingItem.setItem(blockEntity.getSelling());
+        if (sellingItem != null) {
+            Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(sellingItem).render(sellingItem, f, ShoppyClient.tick, poseStack, multiBufferSource, i);
         }
 
         poseStack.pushPose();
