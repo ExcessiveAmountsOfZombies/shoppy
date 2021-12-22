@@ -1,9 +1,10 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "com.epherical.shoppy.shoppyfabric.mixin",
+  "package": "com.epherical.shoppy.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
+    "ChatMixin"
   ],
   "client": [
   ],

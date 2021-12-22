@@ -71,12 +71,7 @@ public abstract class AbstractTradingBlock extends Block implements EntityBlock 
         if (blockEntity instanceof AbstractTradingBlockEntity) {
             AbstractTradingBlockEntity shopBlock = (AbstractTradingBlockEntity) blockEntity;
             if ((shopBlock.getOwner().equals(player.getUUID())/* || player.hasPermissions(4)*/) && !level.isClientSide) {
-                if (player.isShiftKeyDown()) {
-                    shopBlock.clearShop();
-                    return InteractionResult.SUCCESS;
-                } else {
-                    return shopBlock.interactWithTradingBlock(blockState, level, blockPos, player, interactionHand, blockHitResult);
-                }
+                return shopBlock.interactWithTradingBlock(blockState, level, blockPos, player, interactionHand, blockHitResult);
             } else {
                 if (!level.isClientSide && !shopBlock.getSelling().isEmpty()) {
                     shopBlock.attemptPurchase(player, item);
@@ -98,7 +93,7 @@ public abstract class AbstractTradingBlock extends Block implements EntityBlock 
         if (shopBlock != null && !level.isClientSide) {
             // owner
             if (shopBlock.getOwner().equals(player.getUUID())) {
-                if (player.isShiftKeyDown()) {
+                if (player.isCrouching()) {
                     shopBlock.extractItemsFromShop(level, blockPos);
                 } else {
                     shopBlock.sendInformationToOwner(player);

@@ -74,6 +74,22 @@ public abstract class AbstractTradingBlockEntity extends BlockEntity implements 
 
     public abstract void userLeftClickTradingBlock(BlockState blockState, Level level, BlockPos blockPos, Player player);
 
+    public int putItemIntoShop(ItemStack item) {
+        if (!item.isEmpty()) {
+            if (this.storedSellingItems > maxStorage) {
+                return 0;
+            }
+
+            int itemsInserted = Math.min(item.getCount(), remainingItemStorage());
+
+            this.storedSellingItems += itemsInserted;
+            item.shrink(itemsInserted);
+
+            return itemsInserted;
+        }
+        return 0;
+    }
+
     public void extractItemsFromShop(Level level, BlockPos pos) {
         int itemsToTake = Math.min(64, storedSellingItems);
         ItemStack selling = getSelling().copy();
@@ -110,6 +126,11 @@ public abstract class AbstractTradingBlockEntity extends BlockEntity implements 
         return list;
     }
 
+    public void addSellingItem(ItemStack item) {
+        this.selling = item;
+        markUpdated();
+    }
+
     public void setOwner(UUID owner) {
         this.owner = owner;
     }
@@ -120,5 +141,9 @@ public abstract class AbstractTradingBlockEntity extends BlockEntity implements 
 
     public ItemStack getSelling() {
         return selling;
+    }
+
+    public int remainingItemStorage() {
+        return maxStorage - storedSellingItems;
     }
 }

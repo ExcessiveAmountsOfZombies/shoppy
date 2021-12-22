@@ -56,6 +56,7 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         super.clearContent();
         currency = ItemStack.EMPTY;
         currencyStored = 0;
+        markUpdated();
     }
 
 
@@ -72,11 +73,6 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         tag.put("selling", selling.save(new CompoundTag()));
         tag.putUUID("owner", owner);
         return tag;
-    }
-
-    public void addSellingItem(ItemStack item) {
-        this.selling = item;
-        markUpdated();
     }
 
     public void addCurrencyItem(ItemStack item) {
@@ -129,10 +125,13 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
                     player.addItem(selling.copy());
                     Component buyer = new TranslatableComponent("barter.purchase.transaction_success", selling.getDisplayName()).setStyle(ShoppyMod.APPROVAL_STYLE);
                     player.sendMessage(buyer, Util.NIL_UUID);
+                    //todo: maybe good to move this into its own method?
+                    storedSellingItems -= amountToGive;
+                    currencyStored += price;
 
                     if (owner != null) {
                         Component sellerMsg = new TranslatableComponent("barter.purchase.owner.transaction_success", player.getDisplayName(), selling.getDisplayName()).setStyle(ShoppyMod.APPROVAL_STYLE);
-                        player.sendMessage(sellerMsg, Util.NIL_UUID);
+                        owner.sendMessage(sellerMsg, Util.NIL_UUID);
                     }
                     return true;
                 }
@@ -150,24 +149,6 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
             player.sendMessage(component, Util.NIL_UUID);
         }
         return false;
-    }
-
-    public int putItemIntoShop(boolean isCurrency, ItemStack item) {
-        if (!item.isEmpty()) {
-            if (!isCurrency) {
-                if (this.storedSellingItems > maxStorage) {
-                    return 0;
-                }
-
-                int itemsInserted = Math.min(item.getCount(), remainingItemStorage());
-
-                this.storedSellingItems += itemsInserted;
-                item.shrink(itemsInserted);
-
-                return itemsInserted;
-            }
-        }
-        return 0;
     }
 
     public NonNullList<ItemStack> dropItems() {
@@ -202,10 +183,6 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         return currency;
     }
 
-    public ItemStack getSelling() {
-        return selling;
-    }
-
     public void sendInformationToOwner(Player player) {
         Component component = new TranslatableComponent("barter.information.owner.extraction").setStyle(ShoppyMod.CONSTANTS_STYLE);
         player.sendMessage(component, Util.NIL_UUID);
@@ -221,7 +198,13 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
     public InteractionResult interactWithTradingBlock(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         Vec3 hit = blockHitResult.getLocation().subtract(Vec3.atLowerCornerOf(blockPos));
         ItemStack item = player.getMainHandItem();
-        if (hit.y() <= 0.5 && (this.getCurrency().isEmpty()) || this.getCurrency().sameItem(item)) {
+
+        if (player.isCrouching() && hit.y() > 0.5) {
+            clearShop();
+            return InteractionResult.SUCCESS;
+        }
+
+        if (hit.y() <= 0.5 && (this.getCurrency().isEmpty() || this.getCurrency().sameItem(item))) {
             this.addCurrencyItem(item.copy());
             Component setup = new TranslatableComponent("barter.setup.owner.add_currency", item.getDisplayName()).setStyle(ShoppyMod.CONSTANTS_STYLE);
             player.sendMessage(setup, Util.NIL_UUID);
@@ -232,7 +215,7 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
                 Component setup = new TranslatableComponent("barter.setup.owner.add_selling", item.getDisplayName()).setStyle(ShoppyMod.CONSTANTS_STYLE);
                 player.sendMessage(setup, Util.NIL_UUID);
             } else if (ItemStack.isSameItemSameTags(item, this.getSelling())) {
-                this.putItemIntoShop(false, item);
+                this.putItemIntoShop(item);
             }
 
             return InteractionResult.SUCCESS;
@@ -266,6 +249,8 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
             currency.setCount(itemsToTake);
             AbstractTradingBlock.popResource(level, pos, currency);
             currencyStored -= itemsToTake;
+        } else {
+            super.extractItemsFromShop(level, pos);
         }
     }
 }

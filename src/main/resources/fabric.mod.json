@@ -20,12 +20,12 @@
     ]
   },
   "mixins": [
-    "shoppy-fabric.mixins.json"
+    "shoppy.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.12.11",
     "fabric": "*",
     "minecraft": ">=1.18.1",
-    "octo-economy-api": ">=1.0.0"
+    "octo-economy-api": "<=1.0.0"
   }
 }
