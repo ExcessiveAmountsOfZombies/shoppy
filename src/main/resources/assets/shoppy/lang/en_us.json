@@ -2,6 +2,7 @@
   "itemGroup.shoppy.shoppy": "Shoppy",
 
   "block.shoppy.bartering_station": "Bartering Station",
+  "block.shoppy.shop_block": "Shop Block",
 
   "barter.purchase.no_held_item": "It looks like you don't have the necessary items to barter from the shop. Make sure you're holding the item.",
   "barter.purchase.not_enough_items": "You do not have enough items to complete the barter. (Requires: %s, had: %s)",
@@ -32,11 +33,13 @@
 
   "shop.buying.full": "There is not enough space in this shop.",
   "shop.buying.no_held_item": "You must hold the item you want to sell, and it needs to be the same item.",
+  "shop.buying.not_enough_funds": "The owner of the shop does not have enough money for you to purchase from them.",
   "shop.buying.not_enough_items": "You must have enough items in your hand to sell to the shop.",
   "shop.buying.player.success": "You have sold %s for %s.",
   "shop.buying.owner.success": "%s has sold %s to you for %s.",
 
   "shop.information.owner.info": "The Shop Block interacts with a currency and deposits it right into your player account.",
+  "shop.information.owner.info2": "and deposits it right into your player account.",
   "shop.information.owner.insert": "To insert items into the shop, right click on the glass case.",
   "shop.information.owner.reset": "If there is already an item in there, you will have to clear it by shift right clicking first.",
   "shop.information.owner.update": "To swap between buying and selling, hold crouch and right click on the wooden sign of the shop.",
@@ -60,6 +63,11 @@
   "shop.setup.owner.add_selling": "This shop will now sell %s to players.",
   "shop.setup.owner.add_buying": "This shop will now buy %s from players.",
 
+  "shop.error.no_economy": "There is no supported economy mod installed. Interaction terminated.",
 
-  "common.purchase.full_inventory": "You can not trade when your inventory is full."
+
+  "common.purchase.full_inventory": "You can not trade when your inventory is full.",
+  "common.station.message_for": "for",
+  "common.station.message_buying": "Buying",
+  "common.station.message_selling": "Selling"
 }

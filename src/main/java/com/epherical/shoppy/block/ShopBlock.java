@@ -16,9 +16,11 @@ import java.util.List;
 
 public class ShopBlock extends AbstractTradingBlock {
 
+    private final boolean creative;
 
-    public ShopBlock(Properties properties) {
+    public ShopBlock(Properties properties, boolean creative) {
         super(properties);
+        this.creative = creative;
     }
 
     @Nullable
@@ -29,7 +31,7 @@ public class ShopBlock extends AbstractTradingBlock {
 
     @Override
     public void appendHoverText(ItemStack itemStack, @Nullable BlockGetter blockGetter, List<Component> list, TooltipFlag tooltipFlag) {
-        Component info = new TranslatableComponent("shop.information.owner.info").setStyle(ShoppyMod.CONSTANTS_STYLE);
+        /*Component info = new TranslatableComponent("shop.information.owner.info").setStyle(ShoppyMod.CONSTANTS_STYLE);
         Component insert = new TranslatableComponent("shop.information.owner.insert").setStyle(ShoppyMod.APPROVAL_STYLE);
         Component reset = new TranslatableComponent("shop.information.owner.reset").setStyle(ShoppyMod.CONSTANTS_STYLE);
         Component update = new TranslatableComponent("shop.information.owner.update").setStyle(ShoppyMod.APPROVAL_STYLE);
@@ -38,7 +40,7 @@ public class ShopBlock extends AbstractTradingBlock {
         list.add(insert);
         list.add(reset);
         list.add(update);
-        list.add(pricing);
+        list.add(pricing);*/
         super.appendHoverText(itemStack, blockGetter, list, tooltipFlag);
 
 

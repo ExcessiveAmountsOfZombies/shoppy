@@ -59,7 +59,6 @@ public class ShopBlockRenderer implements BlockEntityRenderer<ShopBlockEntity> {
         poseStack.mulPose(Vector3f.XP.rotation(22.4f));
         poseStack.mulPose(Vector3f.ZP.rotation(22f));
 
-        // todo: LANG (SCOTT)
         String msg;
         if (blockEntity.isBuyingFromPlayer()) {
             msg = "Buying x";

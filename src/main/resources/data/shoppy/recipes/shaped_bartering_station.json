@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "G#G",
+    "WCW",
+    "OSO"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:glass"
+    },
+    "W": {
+      "tag": "minecraft:carpets"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "O": {
+      "item": "minecraft:oak_log"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    },
+    "G": {
+      "item": "minecraft:gold_nugget"
+    }
+  },
+  "result": {
+    "item": "shoppy:bartering_station",
+    "count": 1
+  }
+}

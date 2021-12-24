@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "WCW",
+    "OSO"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:glass"
+    },
+    "W": {
+      "tag": "minecraft:carpets"
+    },
+    "C": {
+      "item": "minecraft:chest"
+    },
+    "O": {
+      "item": "minecraft:oak_log"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    }
+  },
+  "result": {
+    "item": "shoppy:shop_block",
+    "count": 1
+  }
+}

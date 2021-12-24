@@ -67,7 +67,7 @@ public class ShoppyMod implements ModInitializer {
                 FabricBlockEntityTypeBuilder.create(BarteringBlockEntity::new, BARTERING_STATION).build());
 
         SHOP_BLOCK = Registry.register(Registry.BLOCK, new ResourceLocation("shoppy", "shop_block"),
-                new ShopBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F, 1200F).sound(SoundType.WOOD).noOcclusion()));
+                new ShopBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F, 1200F).sound(SoundType.WOOD).noOcclusion(), false));
         SHOP_BLOCK_ITEM = Registry.register(Registry.ITEM, new ResourceLocation("shoppy", "shop_block"),
                 new BlockItem(SHOP_BLOCK, new Item.Properties().tab(SHOPPY_ITEM_GROUP)));
         SHOP_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new ResourceLocation("shoppy", "shop_block_entity"),
@@ -80,12 +80,11 @@ public class ShoppyMod implements ModInitializer {
         ChatEvent.PRE_CHAT_EVENT.register((msg, player) -> {
             if (awaitingResponse.containsKey(player.getUUID())) {
                 ShopBlockEntity shopBlock = awaitingResponse.get(player.getUUID());
-                // check message, if what we're looking for, cancel.
                 try {
                     int number = Integer.parseInt(msg);
                     if (number >= 0) {
                         shopBlock.setPrice(number);
-                        Component compText = new TextComponent("" + number).setStyle(VARIABLE_STYLE);
+                        Component compText = economyInstance.getDefaultCurrency().format(number);
                         Component success = new TranslatableComponent("shop.pricing.owner.update_complete", compText).setStyle(APPROVAL_STYLE);
                         player.sendMessage(success, Util.NIL_UUID);
                         awaitingResponse.remove(player.getUUID());

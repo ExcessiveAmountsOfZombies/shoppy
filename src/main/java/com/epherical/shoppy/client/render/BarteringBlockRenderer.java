@@ -15,6 +15,8 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.item.ItemEntity;
 
 @Environment(EnvType.CLIENT)
@@ -23,6 +25,8 @@ public class BarteringBlockRenderer implements BlockEntityRenderer<BarteringBloc
     private final ItemRenderer renderer;
     private final Font font;
     private ItemEntity sellingItem;
+    private TranslatableComponent selling;
+    private Component forComp;
 
     public BarteringBlockRenderer(BlockEntityRendererProvider.Context context) {
         this.renderer = Minecraft.getInstance().getItemRenderer();
@@ -58,8 +62,7 @@ public class BarteringBlockRenderer implements BlockEntityRenderer<BarteringBloc
         poseStack.mulPose(Vector3f.XP.rotation(22.4f));
         poseStack.mulPose(Vector3f.ZP.rotation(22f));
 
-        // todo: LANG (SCOTT)
-        this.font.drawInBatch("selling x" + blockEntity.getSelling().getCount(), 0, 0, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
+        this.font.drawInBatch("Selling x" + blockEntity.getSelling().getCount(), 0, 0, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
         this.font.drawInBatch("for", 20,14,0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
         String money = "" + blockEntity.getCurrency().getCount();
         int width = this.font.width(money);

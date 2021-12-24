@@ -1,14 +1,8 @@
 package com.epherical.shoppy.block;
 
-import com.epherical.shoppy.ShoppyMod;
 import com.epherical.shoppy.block.entity.AbstractTradingBlockEntity;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;

@@ -4,7 +4,8 @@
   "package": "com.epherical.shoppy.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "ChatMixin"
+    "ChatMixin",
+    "PlayerMixin"
   ],
   "client": [
   ],
