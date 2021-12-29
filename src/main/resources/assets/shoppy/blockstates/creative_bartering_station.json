@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "shoppy:block/creative_bartering_station",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "shoppy:block/creative_bartering_station",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "shoppy:block/creative_bartering_station"
+    },
+    "facing=west": {
+      "model": "shoppy:block/creative_bartering_station",
+      "y": 90
+    }
+  }
+}
+

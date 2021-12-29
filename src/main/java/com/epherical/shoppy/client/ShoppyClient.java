@@ -24,10 +24,13 @@ public class ShoppyClient implements ClientModInitializer {
                 tick = Integer.MIN_VALUE;
             }
         });
-        System.out.println("Init client incrorrect??");
         BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.BARTERING_STATION, RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.SHOP_BLOCK, RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.CREATIVE_BARTERING_STATION, RenderType.cutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.CREATIVE_SHOP_BLOCK, RenderType.cutout());
         BlockEntityRendererRegistry.register(ShoppyMod.BARTING_STATION_ENTITY, BarteringBlockRenderer::new);
         BlockEntityRendererRegistry.register(ShoppyMod.SHOP_BLOCK_ENTITY, ShopBlockRenderer::new);
+        BlockEntityRendererRegistry.register(ShoppyMod.CREATIVE_BARTERING_STATION_ENTITY, BarteringBlockRenderer::new);
+        BlockEntityRendererRegistry.register(ShoppyMod.CREATIVE_SHOP_BLOCK_ENTITY, ShopBlockRenderer::new);
     }
 }

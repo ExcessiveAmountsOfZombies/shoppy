@@ -20,7 +20,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.item.ItemEntity;
 
 @Environment(EnvType.CLIENT)
-public class BarteringBlockRenderer implements BlockEntityRenderer<BarteringBlockEntity> {
+public class BarteringBlockRenderer<T extends BarteringBlockEntity> implements BlockEntityRenderer<T> {
 
     private final ItemRenderer renderer;
     private final Font font;
@@ -34,7 +34,7 @@ public class BarteringBlockRenderer implements BlockEntityRenderer<BarteringBloc
     }
 
     @Override
-    public void render(BarteringBlockEntity blockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, int j) {
+    public void render(T blockEntity, float f, PoseStack poseStack, MultiBufferSource multiBufferSource, int i, int j) {
         Direction direction = blockEntity.getBlockState().getValue(AbstractTradingBlock.FACING);
         if (sellingItem == null) {
             sellingItem = new ItemEntity(blockEntity.getLevel(), blockEntity.getBlockPos().getX(), blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ(), blockEntity.getSelling());
@@ -73,5 +73,4 @@ public class BarteringBlockRenderer implements BlockEntityRenderer<BarteringBloc
         poseStack.popPose();
 
     }
-
 }

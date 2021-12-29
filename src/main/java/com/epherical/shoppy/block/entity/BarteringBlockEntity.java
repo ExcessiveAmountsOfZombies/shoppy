@@ -2,6 +2,7 @@ package com.epherical.shoppy.block.entity;
 
 import com.epherical.shoppy.ShoppyMod;
 import com.epherical.shoppy.block.AbstractTradingBlock;
+import com.epherical.shoppy.block.BarteringBlock;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -18,6 +19,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -27,12 +29,18 @@ import java.util.UUID;
 
 public class BarteringBlockEntity extends AbstractTradingBlockEntity {
 
-    private ItemStack currency;
-    private int currencyStored;
+    ItemStack currency;
+    int currencyStored;
 
 
     public BarteringBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(ShoppyMod.BARTING_STATION_ENTITY, blockPos, blockState);
+        this.currency = ItemStack.EMPTY;
+        this.currencyStored = 0;
+    }
+
+    public BarteringBlockEntity(BlockEntityType<?> blockEntity, BlockPos blockPos, BlockState blockState) {
+        super(blockEntity, blockPos, blockState);
         this.currency = ItemStack.EMPTY;
         this.currencyStored = 0;
     }
@@ -80,22 +88,15 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         markUpdated();
     }
 
-    public void clearShop() {
-        super.clearShop();
+    public void clearShop(BlockHitResult result) {
+        super.clearShop(result);
         this.currency = ItemStack.EMPTY;
         this.currencyStored = 0;
         markUpdated();
     }
 
-    public void setOwner(UUID owner) {
-        this.owner = owner;
-    }
-
-    public UUID getOwner() {
-        return owner;
-    }
-
-    public boolean attemptPurchase(Player player, ItemStack currencyInHand) {
+    @Override
+    public boolean attemptPurchase(Player player, ItemStack currencyInHand, boolean creativeBlock) {
         Player owner = level.getServer().getPlayerList().getPlayer(this.owner);
         if (ItemStack.isSameItemSameTags(currencyInHand, currency)) {
             int price = currency.getCount();
@@ -109,10 +110,10 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
                         Component ownerMsg = new TranslatableComponent("barter.purchase.owner.shop_empty", location).setStyle(ShoppyMod.CONSTANTS_STYLE);
                         owner.sendMessage(ownerMsg, Util.NIL_UUID);
                     }
-                } else if (remainingCurrencySpaces() <= 0) {
+                } else if (remainingCurrencySpaces() <= 0 && !creativeBlock) {
                     Component buyerMsg = new TranslatableComponent("barter.purchase.currency_full", currency.getDisplayName()).setStyle(ShoppyMod.ERROR_STYLE);
                     player.sendMessage(buyerMsg, Util.NIL_UUID);
-                    if (owner != null) {
+                    if (owner != null && !creativeBlock) {
                         Component location = new TranslatableComponent("X: %s, Y: %s, Z: %s", getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ()).setStyle(ShoppyMod.VARIABLE_STYLE);
                         Component ownerMsg = new TranslatableComponent("barter.purchase.owner.currency_full", location).setStyle(ShoppyMod.CONSTANTS_STYLE);
                         owner.sendMessage(ownerMsg, Util.NIL_UUID);
@@ -125,9 +126,10 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
                     player.addItem(selling.copy());
                     Component buyer = new TranslatableComponent("barter.purchase.transaction_success", selling.getDisplayName()).setStyle(ShoppyMod.APPROVAL_STYLE);
                     player.sendMessage(buyer, Util.NIL_UUID);
-                    //todo: maybe good to move this into its own method?
-                    storedSellingItems -= amountToGive;
-                    currencyStored += price;
+                    if (!creativeBlock) {
+                        storedSellingItems -= amountToGive;
+                        currencyStored += price;
+                    }
 
                     if (owner != null) {
                         Component sellerMsg = new TranslatableComponent("barter.purchase.owner.transaction_success", player.getDisplayName(), selling.getDisplayName()).setStyle(ShoppyMod.APPROVAL_STYLE);
@@ -200,7 +202,7 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         ItemStack item = player.getMainHandItem();
 
         if (player.isCrouching() && hit.y() > 0.5) {
-            clearShop();
+            clearShop(blockHitResult);
             return InteractionResult.SUCCESS;
         }
 

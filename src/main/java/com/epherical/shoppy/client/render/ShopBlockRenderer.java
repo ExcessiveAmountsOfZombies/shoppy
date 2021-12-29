@@ -19,7 +19,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
 
 @Environment(EnvType.CLIENT)
-public class ShopBlockRenderer implements BlockEntityRenderer<ShopBlockEntity> {
+public class ShopBlockRenderer<T extends ShopBlockEntity> implements BlockEntityRenderer<T> {
 
     private final ItemRenderer renderer;
     private final Font font;

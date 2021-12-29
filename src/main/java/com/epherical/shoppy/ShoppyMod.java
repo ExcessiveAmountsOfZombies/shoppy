@@ -4,11 +4,14 @@ import com.epherical.octoecon.api.Economy;
 import com.epherical.octoecon.api.event.EconomyEvents;
 import com.epherical.shoppy.block.AbstractTradingBlock;
 import com.epherical.shoppy.block.BarteringBlock;
+import com.epherical.shoppy.block.CreativeBarteringBlock;
+import com.epherical.shoppy.block.CreativeShopBlock;
 import com.epherical.shoppy.block.ShopBlock;
 import com.epherical.shoppy.block.entity.BarteringBlockEntity;
+import com.epherical.shoppy.block.entity.CreativeBarteringBlockEntity;
+import com.epherical.shoppy.block.entity.CreativeShopBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -17,22 +20,18 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 public class ShoppyMod implements ModInitializer {
@@ -41,9 +40,17 @@ public class ShoppyMod implements ModInitializer {
     public static AbstractTradingBlock BARTERING_STATION;
     public static Item BARTING_STATION_ITEM;
 
+    public static BlockEntityType<CreativeBarteringBlockEntity> CREATIVE_BARTERING_STATION_ENTITY;
+    public static CreativeBarteringBlock CREATIVE_BARTERING_STATION;
+    public static Item CREATIVE_BARTERING_STATION_ITEM;
+
     public static BlockEntityType<ShopBlockEntity> SHOP_BLOCK_ENTITY;
     public static ShopBlock SHOP_BLOCK;
     public static Item SHOP_BLOCK_ITEM;
+
+    public static BlockEntityType<CreativeShopBlockEntity> CREATIVE_SHOP_BLOCK_ENTITY;
+    public static CreativeShopBlock CREATIVE_SHOP_BLOCK;
+    public static Item CREATIVE_SHOP_BLOCK_ITEM;
 
     public static final CreativeModeTab SHOPPY_ITEM_GROUP = FabricItemGroupBuilder.create(new ResourceLocation("shoppy", "shoppy"))
             .icon(() -> new ItemStack(BARTING_STATION_ITEM))
@@ -72,6 +79,21 @@ public class ShoppyMod implements ModInitializer {
                 new BlockItem(SHOP_BLOCK, new Item.Properties().tab(SHOPPY_ITEM_GROUP)));
         SHOP_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new ResourceLocation("shoppy", "shop_block_entity"),
                 FabricBlockEntityTypeBuilder.create(ShopBlockEntity::new, SHOP_BLOCK).build());
+
+        CREATIVE_BARTERING_STATION = Registry.register(Registry.BLOCK, new ResourceLocation("shoppy", "creative_bartering_station"),
+                new CreativeBarteringBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F, 1200F).sound(SoundType.WOOD).noOcclusion()));
+        CREATIVE_BARTERING_STATION_ITEM = Registry.register(Registry.ITEM, new ResourceLocation("shoppy", "creative_bartering_station"),
+                new BlockItem(CREATIVE_BARTERING_STATION, new Item.Properties().tab(SHOPPY_ITEM_GROUP)));
+        CREATIVE_BARTERING_STATION_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new ResourceLocation("shoppy", "creative_bartering_station_entity"),
+                FabricBlockEntityTypeBuilder.create(CreativeBarteringBlockEntity::new, CREATIVE_BARTERING_STATION).build());
+
+        CREATIVE_SHOP_BLOCK = Registry.register(Registry.BLOCK, new ResourceLocation("shoppy", "creative_shop_block"),
+                new CreativeShopBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F, 1200F).sound(SoundType.WOOD).noOcclusion(), true));
+        CREATIVE_SHOP_BLOCK_ITEM = Registry.register(Registry.ITEM, new ResourceLocation("shoppy", "creative_shop_block"),
+                new BlockItem(CREATIVE_SHOP_BLOCK, new Item.Properties().tab(SHOPPY_ITEM_GROUP)));
+        CREATIVE_SHOP_BLOCK_ENTITY = Registry.register(Registry.BLOCK_ENTITY_TYPE, new ResourceLocation("shoppy", "creative_shop_block_entity"),
+                FabricBlockEntityTypeBuilder.create(CreativeShopBlockEntity::new, CREATIVE_SHOP_BLOCK).build());
+
 
         EconomyEvents.ECONOMY_CHANGE_EVENT.register(economy -> {
             economyInstance = economy;

@@ -2,7 +2,9 @@
   "itemGroup.shoppy.shoppy": "Shoppy",
 
   "block.shoppy.bartering_station": "Bartering Station",
+  "block.shoppy.creative_bartering_station": "Creative Bartering Station",
   "block.shoppy.shop_block": "Shop Block",
+  "block.shoppy.creative_shop_block": "Creative Shop Block",
 
   "barter.purchase.no_held_item": "It looks like you don't have the necessary items to barter from the shop. Make sure you're holding the item.",
   "barter.purchase.not_enough_items": "You do not have enough items to complete the barter. (Requires: %s, had: %s)",

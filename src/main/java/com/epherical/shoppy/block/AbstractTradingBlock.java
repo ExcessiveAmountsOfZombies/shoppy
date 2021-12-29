@@ -59,7 +59,6 @@ public abstract class AbstractTradingBlock extends Block implements EntityBlock 
 
     @Override
     public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
-        Vec3 hit = blockHitResult.getLocation().subtract(Vec3.atLowerCornerOf(blockPos));
         ItemStack item = player.getMainHandItem();
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
         if (blockEntity instanceof AbstractTradingBlockEntity) {
@@ -68,12 +67,10 @@ public abstract class AbstractTradingBlock extends Block implements EntityBlock 
                 return shopBlock.interactWithTradingBlock(blockState, level, blockPos, player, interactionHand, blockHitResult);
             } else {
                 if (!level.isClientSide && !shopBlock.getSelling().isEmpty()) {
-                    shopBlock.attemptPurchase(player, item);
+                    shopBlock.attemptPurchase(player, item, false);
                 }
             }
-
         }
-
         return InteractionResult.CONSUME;
     }
 

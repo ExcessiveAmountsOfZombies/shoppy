@@ -66,7 +66,7 @@ public abstract class AbstractTradingBlockEntity extends BlockEntity implements 
         this.getLevel().sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
     }
 
-    public abstract boolean attemptPurchase(Player player, ItemStack currencyInHand);
+    public abstract boolean attemptPurchase(Player player, ItemStack currencyInHand, boolean creativeBlock);
 
     public abstract void sendInformationToOwner(Player player);
 
@@ -98,8 +98,10 @@ public abstract class AbstractTradingBlockEntity extends BlockEntity implements 
         storedSellingItems -= itemsToTake;
     }
 
-    public void clearShop() {
-        Containers.dropContents(level, getBlockPos().above(), dropItems());
+    public void clearShop(BlockHitResult result) {
+        for (ItemStack stack : dropItems()) {
+            Block.popResourceFromFace(level, getBlockPos(), result.getDirection(), stack);
+        }
         this.selling = ItemStack.EMPTY;
         this.storedSellingItems = 0;
         markUpdated();
