@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.item.ItemEntity;
 
 @Environment(EnvType.CLIENT)
@@ -25,7 +24,7 @@ public class BarteringBlockRenderer<T extends BarteringBlockEntity> implements B
     private final ItemRenderer renderer;
     private final Font font;
     private ItemEntity sellingItem;
-    private TranslatableComponent selling;
+    private Component selling;
     private Component forComp;
 
     public BarteringBlockRenderer(BlockEntityRendererProvider.Context context) {

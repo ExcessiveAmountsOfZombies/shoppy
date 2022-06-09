@@ -23,9 +23,9 @@
     "shoppy.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.12.12",
-    "fabric": ">=0.44.0",
-    "minecraft": ">=1.18.1",
-    "octo-economy-api": "<=1.0.0"
+    "fabricloader": ">=0.14.6",
+    "fabric": ">=0.55.1",
+    "minecraft": ">=1.19",
+    "octo-economy-api": ">=1.0.0"
   }
 }

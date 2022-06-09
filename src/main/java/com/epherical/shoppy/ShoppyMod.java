@@ -18,18 +18,16 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BlockItem;
@@ -128,30 +126,29 @@ public class ShoppyMod implements ModInitializer {
                     if (number >= 0) {
                         shopBlock.setPrice(number);
                         Component compText = economyInstance.getDefaultCurrency().format(number);
-                        Component success = new TranslatableComponent("shop.pricing.owner.update_complete", compText).setStyle(APPROVAL_STYLE);
-                        player.sendMessage(success, Util.NIL_UUID);
+                        Component success = Component.translatable("shop.pricing.owner.update_complete", compText).setStyle(APPROVAL_STYLE);
+                        player.sendSystemMessage(success);
                         awaitingResponse.remove(player.getUUID());
                         return true;
                     }
                 } catch (NumberFormatException ignored) {
                     awaitingResponse.remove(player.getUUID());
-                    Component message = new TranslatableComponent("shop.pricing.owner.update_fail").setStyle(ERROR_STYLE);
-                    player.sendMessage(message, Util.NIL_UUID);
+                    Component message = Component.translatable("shop.pricing.owner.update_fail").setStyle(ERROR_STYLE);
+                    player.sendSystemMessage(message);
                     return true;
                 }
             }
             return false;
         });
-
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             dispatcher.register(literal("shoppy")
                     .requires(commandSourceStack -> commandSourceStack.hasPermission(4))
-                            .then(literal("admin_shop")
-                                    .then(argument("block", BlockPosArgument.blockPos())
-                                            .executes(this::createAdminShop)))
-                            .then(literal("npc_shop")
-                                    .then(argument("block", BlockPosArgument.blockPos())
-                                            .executes(this::createNPCShop))));
+                    .then(literal("admin_shop")
+                            .then(argument("block", BlockPosArgument.blockPos())
+                                    .executes(this::createAdminShop)))
+                    .then(literal("npc_shop")
+                            .then(argument("block", BlockPosArgument.blockPos())
+                                    .executes(this::createNPCShop))));
         });
     }
 
