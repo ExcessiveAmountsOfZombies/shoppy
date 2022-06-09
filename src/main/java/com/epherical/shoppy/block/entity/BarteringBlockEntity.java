@@ -206,8 +206,17 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
             return InteractionResult.SUCCESS;
         }
 
-        if (hit.y() <= 0.5 && (this.getCurrency().isEmpty() || this.getCurrency().sameItem(item))) {
-            this.addCurrencyItem(item.copy());
+        boolean sameItem = this.getCurrency().sameItem(item);
+        if (hit.y() <= 0.5 && (this.getCurrency().isEmpty() || sameItem)) {
+            if (item.getCount() == 1 && sameItem) {
+                if (currency.getCount() < currency.getMaxStackSize())
+                currency.setCount(currency.getCount() + 1);
+                markUpdated();
+                return InteractionResult.SUCCESS;
+            } else {
+                this.addCurrencyItem(item.copy());
+            }
+
             Component setup = new TranslatableComponent("barter.setup.owner.add_currency", item.getDisplayName()).setStyle(ShoppyMod.CONSTANTS_STYLE);
             player.sendMessage(setup, Util.NIL_UUID);
             return InteractionResult.SUCCESS;
