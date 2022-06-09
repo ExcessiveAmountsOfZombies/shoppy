@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class CreativeBarteringBlockEntity extends BarteringBlockEntity {
+public class CreativeBarteringBlockEntity extends BarteringBlockEntity implements CreativeBlock {
 
 
     public CreativeBarteringBlockEntity(BlockPos blockPos, BlockState blockState) {

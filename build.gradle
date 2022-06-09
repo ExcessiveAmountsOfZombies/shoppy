@@ -10,6 +10,9 @@ repositories {
     maven {
         url = "https://oss.sonatype.org/content/repositories/snapshots"
     }
+    maven {
+        url = "https://jitpack.io"
+    }
     mavenLocal()
     // Add repositories to retrieve artifacts from in here.
     // You should only use this when depending on other mods because
@@ -28,9 +31,9 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "com.github.ExcessiveAmountsOfZombies:OctoEconomyApi:5137175b1c"
     modImplementation "com.epherical.octo-economy-api:OctoEconomyApi:1.0.0"
     include "com.epherical.octo-economy-api:OctoEconomyApi:1.0.0"
-
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
 }

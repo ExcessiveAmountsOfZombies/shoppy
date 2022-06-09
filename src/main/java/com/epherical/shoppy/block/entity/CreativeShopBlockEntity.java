@@ -7,7 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class CreativeShopBlockEntity extends ShopBlockEntity {
+public class CreativeShopBlockEntity extends ShopBlockEntity implements CreativeBlock {
 
     public CreativeShopBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(ShoppyMod.CREATIVE_SHOP_BLOCK_ENTITY, blockPos, blockState);

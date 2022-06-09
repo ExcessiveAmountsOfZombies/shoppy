@@ -2,6 +2,7 @@ package com.epherical.shoppy;
 
 import com.epherical.octoecon.api.Economy;
 import com.epherical.octoecon.api.event.EconomyEvents;
+import com.epherical.octoecon.api.user.UniqueUser;
 import com.epherical.shoppy.block.AbstractTradingBlock;
 import com.epherical.shoppy.block.BarteringBlock;
 import com.epherical.shoppy.block.CreativeBarteringBlock;
@@ -9,30 +10,43 @@ import com.epherical.shoppy.block.CreativeShopBlock;
 import com.epherical.shoppy.block.ShopBlock;
 import com.epherical.shoppy.block.entity.BarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeBarteringBlockEntity;
+import com.epherical.shoppy.block.entity.CreativeBlock;
 import com.epherical.shoppy.block.entity.CreativeShopBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
 import com.google.common.collect.Maps;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.Util;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.UUID;
+
+import static net.minecraft.commands.Commands.*;
 
 public class ShoppyMod implements ModInitializer {
 
@@ -63,6 +77,9 @@ public class ShoppyMod implements ModInitializer {
 
     public static Economy economyInstance;
     public static Map<UUID, ShopBlockEntity> awaitingResponse = Maps.newHashMap();
+
+    @Nullable
+    public static UniqueUser ADMIN = null;
 
     @Override
     public void onInitialize() {
@@ -97,6 +114,10 @@ public class ShoppyMod implements ModInitializer {
 
         EconomyEvents.ECONOMY_CHANGE_EVENT.register(economy -> {
             economyInstance = economy;
+            ADMIN = economyInstance.getOrCreatePlayerAccount(Util.NIL_UUID);
+            if (ADMIN != null) {
+                ADMIN.depositMoney(economyInstance.getDefaultCurrency(), 240204204, "admin account");
+            }
         });
 
         ChatEvent.PRE_CHAT_EVENT.register((msg, player) -> {
@@ -121,5 +142,40 @@ public class ShoppyMod implements ModInitializer {
             }
             return false;
         });
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+            dispatcher.register(literal("shoppy")
+                    .requires(commandSourceStack -> commandSourceStack.hasPermission(4))
+                            .then(literal("admin_shop")
+                                    .then(argument("block", BlockPosArgument.blockPos())
+                                            .executes(this::createAdminShop)))
+                            .then(literal("npc_shop")
+                                    .then(argument("block", BlockPosArgument.blockPos())
+                                            .executes(this::createNPCShop))));
+        });
+    }
+
+    private int createNPCShop(CommandContext<CommandSourceStack> stack) throws CommandSyntaxException {
+        BlockPos possibleShopPos = BlockPosArgument.getLoadedBlockPos(stack, "block");
+        ServerPlayer player = stack.getSource().getPlayerOrException();
+        BlockEntity blockEntity = player.getLevel().getBlockEntity(possibleShopPos);
+        if (blockEntity instanceof CreativeBlock creativeBlock) {
+            if (ADMIN != null) {
+                creativeBlock.setOwner(ADMIN.getUserID());
+            } else {
+                stack.getSource().sendFailure(Component.nullToEmpty("Admin account could not be found. You are still the owner."));
+            }
+        }
+        return 1;
+    }
+
+    private int createAdminShop(CommandContext<CommandSourceStack> stack) throws CommandSyntaxException {
+        BlockPos possibleShopPos = BlockPosArgument.getLoadedBlockPos(stack, "block");
+        ServerPlayer player = stack.getSource().getPlayerOrException();
+        BlockEntity blockEntity = player.getLevel().getBlockEntity(possibleShopPos);
+        if (ADMIN != null && blockEntity instanceof CreativeBlock creativeBlock && creativeBlock.getOwner().equals(ADMIN.getUserID())) {
+            creativeBlock.setOwner(player.getUUID());
+        }
+        return 1;
     }
 }
