@@ -155,12 +155,13 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         list.addAll(super.dropItems());
         int currency = this.currencyStored;
 
+        int maxStackSize = this.currency.getMaxStackSize();
         while (currency != 0) {
             ItemStack copy = this.currency.copy();
-            if (currency >= 64) {
-                copy.setCount(64);
+            if (currency >= maxStackSize) {
+                copy.setCount(maxStackSize);
                 list.add(copy);
-                currency -= 64;
+                currency -= maxStackSize;
             } else {
                 copy.setCount(currency);
                 list.add(copy);
