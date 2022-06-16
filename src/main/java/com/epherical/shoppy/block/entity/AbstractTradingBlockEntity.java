@@ -112,12 +112,13 @@ public abstract class AbstractTradingBlockEntity extends BlockEntity implements 
 
         int itemsStored = this.storedSellingItems;
 
+        int maxStackSize = this.selling.getMaxStackSize();
         while (itemsStored != 0) {
             ItemStack copy = this.selling.copy();
-            if (itemsStored >= 64) {
-                copy.setCount(64);
+            if (itemsStored >= maxStackSize) {
+                copy.setCount(maxStackSize);
                 list.add(copy);
-                itemsStored -= 64;
+                itemsStored -= maxStackSize;
             } else {
                 copy.setCount(itemsStored);
                 list.add(copy);
