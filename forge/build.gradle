@@ -1,0 +1,183 @@
+buildscript {
+    repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url= 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1+', changing: true
+        classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+    }
+}
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.spongepowered.mixin'
+
+archivesBaseName = archives_base_name + "-" + minecraft_version + "-FORGE"
+
+configurations {
+    shade
+    compileOnly.extendsFrom shade
+    compileOnly.extendsFrom shadeSource
+}
+
+minecraft {
+    //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    mappings channel: 'official', version: "${minecraft_version}"
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'legacyClassPath', '{minecraft_classpath}'
+            //arg "-mixin.config=shoppy.mixins.json"
+            // Recommended logging data for a userdev environment
+            //property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            // Recommended logging level for the console //property 'forge.logging.console.level', 'debug'
+            args '--mod', 'shoppy', '--all', '--output', file('src/generated/resources/'), '--existing', rootProject.file('src/main/resources/')
+            mods {
+                shoppy {
+                    sources(sourceSets.main, rootProject.sourceSets.main)
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                shoppy {
+                    sources(sourceSets.main, rootProject.sourceSets.main)
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+            property 'legacyClassPath', '{minecraft_classpath}'
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            args '--mod', 'shoppy', '--all', '--output', file('src/generated/resources/'), '--existing', rootProject.file('src/main/resources/')
+            mods {
+                shoppy {
+                    sources(sourceSets.main, rootProject.sourceSets.main)
+                }
+            }
+        }
+    }
+}
+
+processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.processResources.dependsOn(rootProject.tasks.processResources)
+
+repositories {
+    mavenLocal()
+}
+
+jarJar.enable()
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    shadow(rootProject)
+    shade(rootProject) {
+        transitive = false
+    }
+
+    jarJar(group: 'com.epherical.octo-economy-api', name: 'OctoEconomyApi-forge', version: '[1.0,)') {
+        transitive = false
+    }
+
+    implementation fg.deobf("com.epherical.octo-economy-api:OctoEconomyApi-forge:1.0.1-1.18.2")
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+    source(rootProject.sourceSets.main.allSource)
+}
+
+shadowJar {
+    archiveClassifier = ""
+    enabled = true
+    configurations = [project.configurations.shade]
+}
+
+artifacts {
+    archives shadowJar
+    shadow shadowJar
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title": "idshoppy",
+                "Specification-Vendor": "epherical.com",
+                "Specification-Version": "1",
+                "Implementation-Title": "${archives_base_name}",
+                "Implementation-Version": "${mod_version}",
+                "Implementation-Vendor" :"epherical.com",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+tasks.build.dependsOn(tasks.shadowJar)
+
+reobf {
+    shadowJar {}
+}
+
+jar.finalizedBy('reobfJarJar')
+
+task sourceJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+// configure the maven publication
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "${archives_base_name}-" + artifactId
+            version = version + "-${minecraft_version}"
+            // add all the jars that should be included when publishing to maven
+
+            artifact jar
+            artifact sourceJar
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += [
+                    rootProject.sourceSets.main.java
+            ]
+        }
+        resources {
+            srcDirs += [
+                    "src/main/generated",
+                    rootProject.sourceSets.main.resources
+            ]
+        }
+    }
+}

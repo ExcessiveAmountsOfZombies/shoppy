@@ -1,24 +1,19 @@
 package com.epherical.shoppy.client.render;
 
 import com.epherical.shoppy.block.AbstractTradingBlock;
-import com.epherical.shoppy.block.entity.BarteringBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
 import com.epherical.shoppy.client.ShoppyClient;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
 
-@Environment(EnvType.CLIENT)
 public class ShopBlockRenderer<T extends ShopBlockEntity> implements BlockEntityRenderer<T> {
 
     private final ItemRenderer renderer;
@@ -36,7 +31,7 @@ public class ShopBlockRenderer<T extends ShopBlockEntity> implements BlockEntity
         if (sellingItem == null) {
             sellingItem = new ItemEntity(blockEntity.getLevel(), blockEntity.getBlockPos().getX(), blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ(), blockEntity.getSelling());
         }
-        int k = (int)blockEntity.getBlockPos().asLong();
+        int k = (int) blockEntity.getBlockPos().asLong();
         poseStack.pushPose();
         poseStack.translate(0.5D, 0.55D, 0.5D);
         poseStack.mulPose(Vector3f.YP.rotationDegrees(-direction.toYRot()));
@@ -66,10 +61,10 @@ public class ShopBlockRenderer<T extends ShopBlockEntity> implements BlockEntity
             msg = "Selling x";
         }
         this.font.drawInBatch(msg + blockEntity.getSelling().getCount(), 0, 0, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
-        this.font.drawInBatch("for", 20,14,0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
+        this.font.drawInBatch("for", 20, 14, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
         String money = "" + blockEntity.getPrice();
         int width = this.font.width(money);
-        this.font.drawInBatch(money , 26 - (width / 2.0f), 32, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
+        this.font.drawInBatch(money, 26 - (width / 2.0f), 32, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
 
         poseStack.popPose();
         poseStack.popPose();

@@ -15,7 +15,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerGamePacketListenerImpl.class)
 public abstract class ChatMixin {
 
-    @Shadow public abstract ServerPlayer getPlayer();
+    @Shadow
+    public abstract ServerPlayer getPlayer();
 
     @Inject(method = "handleChat(Lnet/minecraft/network/protocol/game/ServerboundChatPacket;Lnet/minecraft/server/network/FilteredText;)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/network/protocol/game/ServerboundChatPacket;getSignature(Ljava/util/UUID;)Lnet/minecraft/network/chat/MessageSignature;"),
