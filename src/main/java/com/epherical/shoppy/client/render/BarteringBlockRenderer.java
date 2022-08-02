@@ -5,8 +5,6 @@ import com.epherical.shoppy.block.entity.BarteringBlockEntity;
 import com.epherical.shoppy.client.ShoppyClient;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Vector3f;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -19,7 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.item.ItemEntity;
 
-@Environment(EnvType.CLIENT)
 public class BarteringBlockRenderer<T extends BarteringBlockEntity> implements BlockEntityRenderer<T> {
 
     private final ItemRenderer renderer;
@@ -39,7 +36,7 @@ public class BarteringBlockRenderer<T extends BarteringBlockEntity> implements B
         if (sellingItem == null) {
             sellingItem = new ItemEntity(blockEntity.getLevel(), blockEntity.getBlockPos().getX(), blockEntity.getBlockPos().getY(), blockEntity.getBlockPos().getZ(), blockEntity.getSelling());
         }
-        int k = (int)blockEntity.getBlockPos().asLong();
+        int k = (int) blockEntity.getBlockPos().asLong();
         poseStack.pushPose();
         poseStack.translate(0.5D, 0.55D, 0.5D);
         poseStack.mulPose(Vector3f.YP.rotationDegrees(-direction.toYRot()));
@@ -63,10 +60,10 @@ public class BarteringBlockRenderer<T extends BarteringBlockEntity> implements B
         poseStack.mulPose(Vector3f.ZP.rotation(22f));
 
         this.font.drawInBatch("Selling x" + blockEntity.getSelling().getCount(), 0, 0, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
-        this.font.drawInBatch("for", 20,14,0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
+        this.font.drawInBatch("for", 20, 14, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
         String money = "" + blockEntity.getCurrency().getCount();
         int width = this.font.width(money);
-        this.font.drawInBatch(money , 26 - (width / 2.0f), 32, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
+        this.font.drawInBatch(money, 26 - (width / 2.0f), 32, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
 
         poseStack.popPose();
         poseStack.popPose();

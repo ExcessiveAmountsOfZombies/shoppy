@@ -13,19 +13,19 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "com.epherical.shoppy.client.ShoppyClient"
+      "com.epherical.shoppy.client.FabricClient"
     ],
     "main": [
-      "com.epherical.shoppy.ShoppyMod"
+      "com.epherical.shoppy.FabricShoppy"
     ]
   },
   "mixins": [
     "shoppy.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.12.12",
-    "fabric": ">=0.44.0",
+    "fabricloader": ">=0.14.7",
+    "fabric": ">=0.54.0",
     "minecraft": ">=1.18.1",
-    "octo-economy-api": "<=1.0.0"
+    "octo-economy-api": "<2.0.0"
   }
 }
