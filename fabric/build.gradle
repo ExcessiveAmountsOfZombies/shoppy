@@ -71,22 +71,6 @@ loom {
     }
 }
 
-sourceSets {
-    main {
-        java {
-            srcDirs += [
-                    rootProject.sourceSets.main.java
-            ]
-        }
-        resources {
-            srcDirs += [
-                    "src/main/generated",
-                    rootProject.sourceSets.main.resources
-            ]
-        }
-    }
-}
-
 def targetJavaVersion = 17
 tasks.withType(JavaCompile).configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is

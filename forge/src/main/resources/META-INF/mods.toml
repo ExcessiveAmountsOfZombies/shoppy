@@ -31,7 +31,7 @@ while bartering can be used as is.
 [[dependencies.shoppy]]
    modId="minecraft"
    mandatory=true
-   versionRange="[1.18.2,)"
+   versionRange="[1.19,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.shoppy]]

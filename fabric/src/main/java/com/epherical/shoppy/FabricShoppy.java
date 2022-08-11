@@ -12,6 +12,7 @@ import com.epherical.shoppy.block.entity.ShopBlockEntity;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.Util;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
@@ -75,27 +76,27 @@ public class FabricShoppy extends ShoppyMod implements ModInitializer {
             }
         });
 
-        ChatEvent.PRE_CHAT_EVENT.register((msg, player) -> {
+        ServerMessageEvents.ALLOW_CHAT_MESSAGE.register((msg, player, params) -> {
             if (awaitingResponse.containsKey(player.getUUID())) {
                 ShopBlockEntity shopBlock = awaitingResponse.get(player.getUUID());
                 try {
-                    int number = Integer.parseInt(msg);
+                    int number = Integer.parseInt(msg.serverContent().getString());
                     if (number >= 0) {
                         shopBlock.setPrice(number);
                         Component compText = economyInstance.getDefaultCurrency().format(number);
                         Component success = Component.translatable("shop.pricing.owner.update_complete", compText).setStyle(APPROVAL_STYLE);
                         player.sendSystemMessage(success);
                         awaitingResponse.remove(player.getUUID());
-                        return true;
+                        return false;
                     }
                 } catch (NumberFormatException ignored) {
                     awaitingResponse.remove(player.getUUID());
                     Component message = Component.translatable("shop.pricing.owner.update_fail").setStyle(ERROR_STYLE);
                     player.sendSystemMessage(message);
-                    return true;
+                    return false;
                 }
             }
-            return false;
+            return true;
         });
 
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {

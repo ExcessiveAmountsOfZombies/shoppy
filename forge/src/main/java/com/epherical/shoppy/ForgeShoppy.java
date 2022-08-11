@@ -58,7 +58,6 @@ public class ForgeShoppy extends ShoppyMod {
 
     public ForgeShoppy() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        ;
         bus.addListener(ForgeClient::clientSetup);
         bus.addListener(ForgeClient::registerRenderers);
 
@@ -82,9 +81,9 @@ public class ForgeShoppy extends ShoppyMod {
     }
 
     @SubscribeEvent
-    public void onChat(ServerChatEvent event) {
+    public void onChat(ServerChatEvent.Submitted event) {
         ServerPlayer player = event.getPlayer();
-        String msg = event.getMessage();
+        String msg = event.getMessage().getString();
         if (awaitingResponse.containsKey(player.getUUID())) {
             ShopBlockEntity shopBlock = awaitingResponse.get(player.getUUID());
             try {
