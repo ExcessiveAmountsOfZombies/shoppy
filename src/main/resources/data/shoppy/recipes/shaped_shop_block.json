@@ -10,7 +10,7 @@
       "item": "minecraft:glass"
     },
     "W": {
-      "tag": "minecraft:carpets"
+      "tag": "minecraft:wool_carpets"
     },
     "C": {
       "item": "minecraft:chest"
