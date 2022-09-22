@@ -33,8 +33,8 @@ dependencies {
 
     modApi "me.lucko:fabric-permissions-api:0.1-SNAPSHOT"
     include "me.lucko:fabric-permissions-api:0.1-SNAPSHOT"
-    include "com.epherical.octo-economy-api:OctoEconomyApi-fabric:1.0.1-1.18.2"
-    modApi "com.epherical.octo-economy-api:OctoEconomyApi-fabric:1.0.1-1.18.2"
+    include "com.epherical.octo-economy-api:OctoEconomyApi-fabric:1.1.0-1.18.2"
+    modApi "com.epherical.octo-economy-api:OctoEconomyApi-fabric:1.1.0-1.18.2"
 
     testCompileOnly('org.jetbrains:annotations:23.0.0')
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -73,11 +73,6 @@ loom {
 
 sourceSets {
     main {
-        java {
-            srcDirs += [
-                    rootProject.sourceSets.main.java
-            ]
-        }
         resources {
             srcDirs += [
                     "src/main/generated",
@@ -150,22 +145,6 @@ publishing {
         // Notice: This block does NOT have the same function as the block in the top level.
         // The repositories here will be used for publishing your artifact, not for
         // retrieving dependencies.
-    }
-}
-
-sourceSets {
-    main {
-        java {
-            srcDirs += [
-                    rootProject.sourceSets.main.java
-            ]
-        }
-        resources {
-            srcDirs += [
-                    "src/main/generated",
-                    rootProject.sourceSets.main.resources
-            ]
-        }
     }
 }
 
