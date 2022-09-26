@@ -1,9 +1,7 @@
 package com.epherical.shoppy.block.entity;
 
-import com.epherical.octoecon.api.Economy;
 import com.epherical.octoecon.api.user.UniqueUser;
 import com.epherical.shoppy.ShoppyMod;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -24,8 +22,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
-
 public class ShopBlockEntity extends AbstractTradingBlockEntity {
 
 
@@ -34,20 +30,17 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
     private boolean isBuyingFromPlayer;
     private int price;
 
-    private Economy economy;
 
     public ShopBlockEntity(BlockPos blockPos, BlockState blockState) {
         super(ShoppyMod.SHOP_BLOCK_ENTITY, blockPos, blockState);
         this.isBuyingFromPlayer = false;
         this.price = 0;
-        this.economy = ShoppyMod.economyInstance;
     }
 
     public ShopBlockEntity(BlockEntityType<?> blockEntity, BlockPos blockPos, BlockState blockState) {
         super(blockEntity, blockPos, blockState);
         this.isBuyingFromPlayer = false;
         this.price = 0;
-        this.economy = ShoppyMod.economyInstance;
     }
 
     @Override
@@ -74,20 +67,20 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
     @Override
     public boolean attemptPurchase(Player player, ItemStack currencyInHand, boolean creativeBlock) {
         Player owner = level.getServer().getPlayerList().getPlayer(this.owner);
-        if (economy == null) {
+        if (ShoppyMod.economyInstance == null) {
             Component noEconomy = Component.translatable("shop.error.no_economy").setStyle(ShoppyMod.ERROR_STYLE);
             player.sendSystemMessage(noEconomy);
             return false;
         }
 
-        UniqueUser ownerUser = economy.getOrCreatePlayerAccount(this.owner);
-        UniqueUser user = economy.getOrCreatePlayerAccount(player.getUUID());
+        UniqueUser ownerUser = ShoppyMod.economyInstance.getOrCreatePlayerAccount(this.owner);
+        UniqueUser user = ShoppyMod.economyInstance.getOrCreatePlayerAccount(player.getUUID());
         if (user != null && ownerUser != null) {
             if (isBuyingFromPlayer) {
-                if (creativeBlock  && user.hasAmount(economy.getDefaultCurrency(), price)) {
+                if (creativeBlock && user.hasAmount(ShoppyMod.economyInstance.getDefaultCurrency(), price)) {
                     return shopBuyFromPlayer(player, currencyInHand, ownerUser, user, owner, true);
                 }
-                if (ownerUser.hasAmount(economy.getDefaultCurrency(), price)) {
+                if (ownerUser.hasAmount(ShoppyMod.economyInstance.getDefaultCurrency(), price)) {
                     return shopBuyFromPlayer(player, currencyInHand, ownerUser, user, owner, false);
                 } else {
                     Component msg = Component.translatable("shop.buying.not_enough_funds").setStyle(ShoppyMod.ERROR_STYLE);
@@ -95,10 +88,10 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
                     return false;
                 }
             } else {
-                if (creativeBlock && user.hasAmount(economy.getDefaultCurrency(), price)) {
+                if (creativeBlock && user.hasAmount(ShoppyMod.economyInstance.getDefaultCurrency(), price)) {
                     return shopSellToPlayer(player, currencyInHand, ownerUser, user, owner, true);
                 }
-                if (user.hasAmount(economy.getDefaultCurrency(), price)) {
+                if (user.hasAmount(ShoppyMod.economyInstance.getDefaultCurrency(), price)) {
                     return shopSellToPlayer(player, currencyInHand, ownerUser, user, owner, false);
                 } else {
                     Component notEnoughMoney = Component.translatable("shop.purchase.not_enough_money").setStyle(ShoppyMod.ERROR_STYLE);
@@ -110,11 +103,10 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
             Component noAccounts = Component.translatable("shop.purchase.no_account").setStyle(ShoppyMod.ERROR_STYLE);
             player.sendSystemMessage(noAccounts);
             LOGGER.error("Missing accounts for a shop transaction!! Player involved {}, UUIDs involved (PURCHASER {}) (OWNER {})", player.getScoreboardName(), player.getUUID(), getOwner());
-            LOGGER.error("This could be a result of an economy implementation being unable to handle offline players?");
+            LOGGER.error("This could be a result of an ShoppyMod.economyInstance implementation being unable to handle offline players?");
         }
         return false;
     }
-
 
 
     private boolean shopSellToPlayer(Player player, ItemStack currencyInHand, UniqueUser ownerUser, UniqueUser playerShopping, Player owner, boolean creative) {
@@ -135,9 +127,9 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
         } else {
             player.addItem(selling.copy());
             if (creative) {
-                playerShopping.withdrawMoney(economy.getDefaultCurrency(), price, "creative shop purchase");
+                playerShopping.withdrawMoney(ShoppyMod.economyInstance.getDefaultCurrency(), price, "creative shop purchase");
             } else {
-                playerShopping.sendTo(ownerUser, economy.getDefaultCurrency(), price);
+                playerShopping.sendTo(ownerUser, ShoppyMod.economyInstance.getDefaultCurrency(), price);
                 storedSellingItems -= amountToGive;
             }
             Component buyer = Component.translatable("shop.purchase.transaction_success", selling.getDisplayName()).setStyle(ShoppyMod.APPROVAL_STYLE);
@@ -168,12 +160,12 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
         } else {
             currencyInHand.shrink(selling.getCount());
             if (creative) {
-                playerShopping.depositMoney(economy.getDefaultCurrency(), moneyToGiveToPlayer, "creative mode shop");
+                playerShopping.depositMoney(ShoppyMod.economyInstance.getDefaultCurrency(), moneyToGiveToPlayer, "creative mode shop");
             } else {
-                ownerUser.sendTo(playerShopping, economy.getDefaultCurrency(), moneyToGiveToPlayer);
+                ownerUser.sendTo(playerShopping, ShoppyMod.economyInstance.getDefaultCurrency(), moneyToGiveToPlayer);
                 storedSellingItems += selling.getCount();
             }
-            Component priceComp = economy.getDefaultCurrency().format(price);
+            Component priceComp = ShoppyMod.economyInstance.getDefaultCurrency().format(price);
             Component seller = Component.translatable("shop.buying.player.success", selling.getDisplayName(), priceComp).setStyle(ShoppyMod.APPROVAL_STYLE);
             player.sendSystemMessage(seller);
             if (owner != null) {
@@ -186,7 +178,7 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
 
     @Override
     public void sendInformationToOwner(Player player) {
-        if (economy == null) {
+        if (ShoppyMod.economyInstance == null) {
             Component noEconomy = Component.translatable("shop.error.no_economy").setStyle(ShoppyMod.ERROR_STYLE);
             player.sendSystemMessage(noEconomy);
             return;
@@ -209,7 +201,7 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
         Vec3 hit = blockHitResult.getLocation().subtract(Vec3.atLowerCornerOf(blockPos));
         ItemStack item = player.getMainHandItem();
 
-        if (economy == null) {
+        if (ShoppyMod.economyInstance == null) {
             Component noEconomy = Component.translatable("shop.error.no_economy").setStyle(ShoppyMod.ERROR_STYLE);
             player.sendSystemMessage(noEconomy);
             return InteractionResult.CONSUME;
@@ -258,7 +250,7 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
 
     @Override
     public void userLeftClickTradingBlock(BlockState blockState, Level level, BlockPos blockPos, Player player) {
-        if (economy == null) {
+        if (ShoppyMod.economyInstance == null) {
             Component noEconomy = Component.translatable("shop.error.no_economy").setStyle(ShoppyMod.ERROR_STYLE);
             player.sendSystemMessage(noEconomy);
             return;
@@ -268,7 +260,7 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
             style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_ITEM, new HoverEvent.ItemStackInfo(this.getSelling())));
             return style;
         });
-        Component currencyAmount = economy.getDefaultCurrency().format(price);
+        Component currencyAmount = ShoppyMod.economyInstance.getDefaultCurrency().format(price);
 
         Component component;
         if (isBuyingFromPlayer) {
