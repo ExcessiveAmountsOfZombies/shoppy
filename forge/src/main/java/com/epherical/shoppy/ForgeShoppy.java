@@ -13,6 +13,7 @@ import com.epherical.shoppy.block.entity.ShopBlockEntity;
 import net.minecraft.Util;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -29,6 +30,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -43,6 +45,8 @@ import net.minecraftforge.server.permission.PermissionAPI;
 import net.minecraftforge.server.permission.events.PermissionGatherEvent;
 import net.minecraftforge.server.permission.nodes.PermissionNode;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
+
+import java.util.Comparator;
 
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
@@ -62,13 +66,6 @@ public class ForgeShoppy extends ShoppyMod {
         bus.addListener(ForgeClient::clientSetup);
         bus.addListener(ForgeClient::registerRenderers);
 
-        ITEM_GROUP = new CreativeModeTab("shoppy") {
-            @Override
-            public ItemStack makeIcon() {
-                return new ItemStack(ShoppyMod.BARTING_STATION_ITEM);
-            }
-        };
-
         MinecraftForge.EVENT_BUS.register(this);
     }
 
@@ -82,7 +79,7 @@ public class ForgeShoppy extends ShoppyMod {
     }
 
     @SubscribeEvent
-    public void onChat(ServerChatEvent.Submitted event) {
+    public void onChat(ServerChatEvent event) {
         ServerPlayer player = event.getPlayer();
         String msg = event.getMessage().getString();
         if (awaitingResponse.containsKey(player.getUUID())) {
@@ -151,13 +148,27 @@ public class ForgeShoppy extends ShoppyMod {
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
 
+
+        @SubscribeEvent
+        public static void registerTab(CreativeModeTabEvent.Register event) {
+            event.registerCreativeModeTab(new ResourceLocation("shoppy", "shoppy_group"), builder -> {
+                builder.title(Component.translatable("itemGroup.shoppy"))
+                        .displayItems((featureFlagSet, output, bl) ->
+                                BuiltInRegistries.ITEM.entrySet().stream()
+                                        .filter(entry -> entry.getKey().location().getNamespace().equals("shoppy"))
+                                        .sorted(Comparator.comparing(entry -> BuiltInRegistries.ITEM.getId(entry.getValue())))
+                                        .forEach(entry -> output.accept(entry.getValue())))
+                        .icon(() -> new ItemStack(BARTING_STATION_ITEM));
+            });
+        }
+
         @SubscribeEvent
         public static void registerEvent(RegisterEvent event) {
             if (event.getRegistryKey().equals(ForgeRegistries.Keys.ITEMS)) {
-                BARTING_STATION_ITEM = new BlockItem(BARTERING_STATION, new Item.Properties().tab(ITEM_GROUP));
-                SHOP_BLOCK_ITEM = new BlockItem(SHOP_BLOCK, new Item.Properties().tab(ITEM_GROUP));
-                CREATIVE_BARTERING_STATION_ITEM = new BlockItem(CREATIVE_BARTERING_STATION, new Item.Properties().tab(ITEM_GROUP));
-                CREATIVE_SHOP_BLOCK_ITEM = new BlockItem(CREATIVE_SHOP_BLOCK, new Item.Properties().tab(ITEM_GROUP));
+                BARTING_STATION_ITEM = new BlockItem(BARTERING_STATION, new Item.Properties());
+                SHOP_BLOCK_ITEM = new BlockItem(SHOP_BLOCK, new Item.Properties());
+                CREATIVE_BARTERING_STATION_ITEM = new BlockItem(CREATIVE_BARTERING_STATION, new Item.Properties());
+                CREATIVE_SHOP_BLOCK_ITEM = new BlockItem(CREATIVE_SHOP_BLOCK, new Item.Properties());
 
                 event.register(ForgeRegistries.Keys.ITEMS, new ResourceLocation("shoppy", "bartering_station"), () -> BARTING_STATION_ITEM);
                 event.register(ForgeRegistries.Keys.ITEMS, new ResourceLocation("shoppy", "shop_block"), () -> SHOP_BLOCK_ITEM);

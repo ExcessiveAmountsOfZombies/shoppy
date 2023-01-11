@@ -4,7 +4,7 @@ import com.epherical.shoppy.block.AbstractTradingBlock;
 import com.epherical.shoppy.block.entity.BarteringBlockEntity;
 import com.epherical.shoppy.client.ShoppyClient;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -38,7 +38,7 @@ public class BarteringBlockRenderer<T extends BarteringBlockEntity> implements B
         int k = (int) blockEntity.getBlockPos().asLong();
         poseStack.pushPose();
         poseStack.translate(0.5D, 0.55D, 0.5D);
-        poseStack.mulPose(Vector3f.YP.rotationDegrees(-direction.toYRot()));
+        poseStack.mulPose(Axis.YP.rotationDegrees(-direction.toYRot()));
         poseStack.scale(0.60F, 0.60F, 0.60F);
         sellingItem.setItem(blockEntity.getSelling());
         if (sellingItem != null) {
@@ -47,16 +47,16 @@ public class BarteringBlockRenderer<T extends BarteringBlockEntity> implements B
 
         poseStack.pushPose();
         poseStack.translate(-0.350D, -0.55D, -0.74);
-        poseStack.mulPose(Vector3f.XP.rotation(22.4f));
-        poseStack.mulPose(Vector3f.ZP.rotation(22f));
+        poseStack.mulPose(Axis.XP.rotation(22.4f));
+        poseStack.mulPose(Axis.ZP.rotation(22f));
         poseStack.scale(0.375F, 0.375F, 0.09F);
         renderer.renderStatic(blockEntity.getCurrency(), ItemTransforms.TransformType.GUI, i, j, poseStack, multiBufferSource, k);
 
         poseStack.pushPose();
         poseStack.translate(-2.0d, 1.3d, 0.4d);
         poseStack.scale(-0.040416667F, -0.040416667F, -0.040416667F);
-        poseStack.mulPose(Vector3f.XP.rotation(22.4f));
-        poseStack.mulPose(Vector3f.ZP.rotation(22f));
+        poseStack.mulPose(Axis.XP.rotation(22.4f));
+        poseStack.mulPose(Axis.ZP.rotation(22f));
 
         this.font.drawInBatch("Selling x" + blockEntity.getSelling().getCount(), 0, 0, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
         this.font.drawInBatch("for", 20, 14, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
