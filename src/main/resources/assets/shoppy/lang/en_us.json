@@ -54,7 +54,7 @@
 
   "shop.pricing.owner.update": "You are now updating the price of your shop. Your next chat message will NOT be sent to players. Make sure to enter a number to update the price.",
   "shop.pricing.owner.update_complete": "You have set the price of your shop to %s.",
-  "shop.pricing.owner.update_fail": "You did not enter a valid number to update your shops pricing.",
+  "shop.pricing.owner.update_fail": "You did not enter a valid number to update your shops pricing. You entered: %s",
 
   "shop.status.update": "This shop is now set to: %s.",
   "shop.status.selling": "Sell to players",

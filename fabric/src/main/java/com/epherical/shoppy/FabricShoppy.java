@@ -11,13 +11,14 @@ import com.epherical.shoppy.block.entity.CreativeShopBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.Util;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -91,15 +92,26 @@ public class FabricShoppy extends ShoppyMod implements ModInitializer {
                     }
                 } catch (NumberFormatException ignored) {
                     awaitingResponse.remove(player.getUUID());
-                    Component message = Component.translatable("shop.pricing.owner.update_fail").setStyle(ERROR_STYLE);
+                    Component message = Component.translatable("shop.pricing.owner.update_fail", msg.serverContent().getString()).setStyle(ERROR_STYLE);
+                    String content = msg.serverContent().getString();
+                    MutableComponent error = Component.literal("");
+                    for (char c : content.toCharArray()) {
+                        if (Character.isDigit(c)) {
+                            error.append(Component.literal(String.valueOf(c)).setStyle(APPROVAL_STYLE));
+                        } else {
+                            error.append(Component.literal(String.valueOf(c)).setStyle(ERROR_STYLE));
+                        }
+                    }
+                    Component otherMessage = Component.translatable("Errors Indicated in red: %s", error).setStyle(CONSTANTS_STYLE);
                     player.sendSystemMessage(message);
+                    player.sendSystemMessage(otherMessage);
                     return false;
                 }
             }
             return true;
         });
 
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+        CommandRegistrationCallback.EVENT.register((dispatcher, commandBuildContext, commandSelection) -> {
             dispatcher.register(literal("shoppy")
                     .requires(commandSourceStack -> commandSourceStack.hasPermission(4))
                     .then(literal("admin_shop")

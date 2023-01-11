@@ -34,10 +34,8 @@ dependencies {
         parchment("org.parchmentmc.data:parchment-${project.minecraftVersion}:${project.parchmentVersion}")
     }
 
-    modApi "me.lucko:fabric-permissions-api:0.1-SNAPSHOT"
-    include "me.lucko:fabric-permissions-api:0.1-SNAPSHOT"
-    include "com.epherical.octo-economy-api:OctoEconomyApi-fabric:1.0.1-1.18.2"
-    modApi "com.epherical.octo-economy-api:OctoEconomyApi-fabric:1.0.1-1.18.2"
+    modImplementation(include("me.lucko:fabric-permissions-api:0.1-SNAPSHOT"))
+    modImplementation(include("com.epherical.octo-economy-api:OctoEconomyApi-fabric:1.0.1-1.18.2"))
 
     modImplementation "net.fabricmc:fabric-loader:${project.fabricLoaderVersion}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabricAPIVersion}"

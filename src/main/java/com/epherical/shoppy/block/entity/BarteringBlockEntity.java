@@ -132,6 +132,7 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
                         Component sellerMsg = Component.translatable("barter.purchase.owner.transaction_success", player.getDisplayName(), selling.getDisplayName()).setStyle(ShoppyMod.APPROVAL_STYLE);
                         owner.sendSystemMessage(sellerMsg);
                     }
+                    markUpdated();
                     return true;
                 }
             } else {
@@ -141,12 +142,14 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
                 component.setStyle(ShoppyMod.ERROR_STYLE);
                 player.sendSystemMessage(component);
             }
+            markUpdated();
             return false;
         } else {
             MutableComponent component = Component.translatable("barter.purchase.no_held_item");
             component.setStyle(ShoppyMod.ERROR_STYLE);
             player.sendSystemMessage(component);
         }
+        markUpdated();
         return false;
     }
 
