@@ -1,11 +1,13 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id 'fabric-loom' version '0.11-SNAPSHOT'
+    id 'fabric-loom' version '1.0-SNAPSHOT'
     id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
-archivesBaseName = archives_base_name
+version = project.modVersion
+group = project.mavenGroup
+archivesBaseName = project.modBaseArchiveName
 
 
 repositories {
@@ -26,21 +28,23 @@ configurations {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    shade(rootProject)
-    shadow(rootProject)
+    minecraft "com.mojang:minecraft:${project.minecraftVersion}"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${project.minecraftVersion}:${project.parchmentVersion}")
+    }
 
     modApi "me.lucko:fabric-permissions-api:0.1-SNAPSHOT"
     include "me.lucko:fabric-permissions-api:0.1-SNAPSHOT"
     include "com.epherical.octo-economy-api:OctoEconomyApi-fabric:1.0.1-1.18.2"
     modApi "com.epherical.octo-economy-api:OctoEconomyApi-fabric:1.0.1-1.18.2"
 
-    testCompileOnly('org.jetbrains:annotations:23.0.0')
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc:fabric-loader:${project.fabricLoaderVersion}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabricAPIVersion}"
 
-    // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    shade(rootProject)
+    compileOnly(rootProject)
+    implementation(rootProject)
 }
 
 processResources {
@@ -58,15 +62,25 @@ loom {
     //accessWidenerPath = file("src/main/resources/bozoiD.accesswidener")
 
     runs {
+        client {
+            client()
+            name "Fabric Client"
+            ideConfigGenerated = true
+        }
+
+        server {
+            server()
+            name "Fabric Server"
+            ideConfigGenerated = true
+        }
+
         datagen {
             server()
-
             name "Data Generation"
             vmArg "-Dfabric-api.datagen"
-            vmArg "-Dfabric-api.datagen.modid=bozoiD"
-            vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
-
+            vmArg "-Dfabric-api.datagen.output-dir=${getRootProject().file("src/main/generated")}"
             runDir "build/datagen"
+            ideConfigGenerated = true
         }
     }
 }
@@ -89,7 +103,7 @@ java {
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
-    archivesBaseName = project.archives_base_name
+    archivesBaseName = project.modBaseArchiveName
     // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
     // if it is present.
     // If you remove this line, sources will not be generated.
@@ -103,14 +117,14 @@ jar {
 }
 
 shadowJar {
-    archiveFileName = rootProject.archives_base_name + "-${rootProject.minecraft_version}-FABRIC-dev.jar"
+    archiveFileName = rootProject.modBaseArchiveName + "-${rootProject.minecraftVersion}-FABRIC-dev.jar"
     configurations = [project.configurations.shade]
 }
 
 task remappedShadowJar(type: RemapJarTask) {
     dependsOn tasks.shadowJar
     input = tasks.shadowJar.archiveFile
-    archiveFileName = rootProject.archives_base_name + "-${rootProject.minecraft_version}-FABRIC-${rootProject.version}.jar"
+    archiveFileName = rootProject.modBaseArchiveName + "-${rootProject.minecraftVersion}-FABRIC-${rootProject.version}.jar"
 }
 
 tasks.assemble.dependsOn tasks.remappedShadowJar
@@ -139,11 +153,6 @@ publishing {
 
 sourceSets {
     main {
-        java {
-            srcDirs += [
-                    rootProject.sourceSets.main.java
-            ]
-        }
         resources {
             srcDirs += [
                     "src/main/generated",

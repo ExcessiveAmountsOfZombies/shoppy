@@ -7,8 +7,8 @@ allprojects {
     apply plugin: 'java-library'
     apply plugin: 'maven-publish'
     apply plugin: 'idea'
-    version = mod_version
-    group = maven_group
+    version = modVersion
+    group = mavenGroup
 
 }
 
@@ -31,13 +31,13 @@ repositories {
 }
 
 minecraft {
-    version(minecraft_version)
+    version(minecraftVersion)
 }
 
 dependencies {
-    compileOnly group:'org.spongepowered', name:'mixin', version:'0.8.5'
+    compileOnly group:'org.spongepowered', name:'mixin', version: mixinVersion
+    compileOnlyApi("org.jetbrains:annotations:${project.JBAnnotationsVersion}")
     implementation('com.epherical.octo-economy-api:OctoEconomyApi:1.0.1-1.18.2')
-    api('org.jetbrains:annotations:23.0.0')
 }
 
 sourceSets {
