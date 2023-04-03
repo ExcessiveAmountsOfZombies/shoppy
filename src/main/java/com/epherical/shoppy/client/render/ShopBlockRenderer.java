@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
-import org.joml.Vector3f;
 
 public class ShopBlockRenderer<T extends ShopBlockEntity> implements BlockEntityRenderer<T> {
 

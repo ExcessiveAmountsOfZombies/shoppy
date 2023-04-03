@@ -20,6 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -145,6 +146,8 @@ public class ForgeShoppy extends ShoppyMod {
         }
     }
 
+    public static MenuType<BarteringMenu> BARTERING_MENU;
+
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
 
@@ -164,6 +167,10 @@ public class ForgeShoppy extends ShoppyMod {
 
         @SubscribeEvent
         public static void registerEvent(RegisterEvent event) {
+            if (event.getRegistryKey().equals(ForgeRegistries.Keys.MENU_TYPES)) {
+                BARTERING_MENU = new MenuType<>((pContainerId, pPlayerInventory) -> new BarteringMenu(BARTERING_MENU, pContainerId, pPlayerInventory));
+                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "bartering_menu"), () -> BARTERING_MENU);
+            }
             if (event.getRegistryKey().equals(ForgeRegistries.Keys.ITEMS)) {
                 BARTING_STATION_ITEM = new BlockItem(BARTERING_STATION, new Item.Properties());
                 SHOP_BLOCK_ITEM = new BlockItem(SHOP_BLOCK, new Item.Properties());
