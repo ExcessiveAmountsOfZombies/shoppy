@@ -21,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -51,6 +52,8 @@ public abstract class ShoppyMod {
     public static BlockEntityType<CreativeShopBlockEntity> CREATIVE_SHOP_BLOCK_ENTITY;
     public static CreativeShopBlock CREATIVE_SHOP_BLOCK;
     public static Item CREATIVE_SHOP_BLOCK_ITEM;
+
+    public static MenuType<BarteringMenu> BARTERING_MENU;
 
     public static Economy economyInstance;
     public static Map<UUID, ShopBlockEntity> awaitingResponse = Maps.newHashMap();

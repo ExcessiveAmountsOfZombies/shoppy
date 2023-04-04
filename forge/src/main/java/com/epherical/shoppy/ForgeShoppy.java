@@ -146,8 +146,6 @@ public class ForgeShoppy extends ShoppyMod {
         }
     }
 
-    public static MenuType<BarteringMenu> BARTERING_MENU;
-
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
 

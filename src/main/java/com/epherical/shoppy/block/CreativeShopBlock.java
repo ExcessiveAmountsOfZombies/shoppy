@@ -1,6 +1,5 @@
 package com.epherical.shoppy.block;
 
-import com.epherical.shoppy.block.entity.CreativeBarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeShopBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;

@@ -12,18 +12,18 @@ import java.util.List;
 public class DenseContainer implements Container {
 
     private final int size;
-    private final NonNullList<DenseItem> items;
+    private final NonNullList<ItemStack> items;
 
     private List<ContainerListener> listeners;
 
     public DenseContainer(int size) {
         this.size = size;
-        this.items = NonNullList.withSize(size, DenseItem.EMPTY);
+        this.items = NonNullList.withSize(size, ItemStack.EMPTY);
     }
 
-    public DenseContainer(DenseItem... pItems) {
+    public DenseContainer(ItemStack... pItems) {
         this.size = pItems.length;
-        this.items = NonNullList.of(DenseItem.EMPTY, pItems);
+        this.items = NonNullList.of(ItemStack.EMPTY, pItems);
     }
 
     public void addListener(ContainerListener pListener) {
@@ -50,8 +50,8 @@ public class DenseContainer implements Container {
 
     @Override
     public boolean isEmpty() {
-        for (DenseItem item : this.items) {
-            if (!item.getSingularItem().isEmpty()) {
+        for (ItemStack item : this.items) {
+            if (!item.isEmpty()) {
                 return false;
             }
         }
@@ -60,7 +60,7 @@ public class DenseContainer implements Container {
 
     @Override
     public ItemStack getItem(int slot) {
-        return slot >= 0 && slot < this.items.size() ? this.items.get(slot).getSingularItem() : ItemStack.EMPTY;
+        return slot >= 0 && slot < this.items.size() ? this.items.get(slot) : net.minecraft.world.item.ItemStack.EMPTY;
     }
 
     @Override
@@ -74,8 +74,8 @@ public class DenseContainer implements Container {
     }
 
     @Override
-    public void setItem(int pSlot, ItemStack pStack) {
-
+    public void setItem(int slot, ItemStack stack) {
+        this.items.set(slot, stack);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class DenseContainer implements Container {
 
     @Override
     public boolean stillValid(Player pPlayer) {
-        return false;
+        return true;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.epherical.shoppy.block.entity;
 
+import com.epherical.shoppy.BarteringMenu;
 import com.epherical.shoppy.ShoppyMod;
 import com.epherical.shoppy.block.AbstractTradingBlock;
 import net.minecraft.core.BlockPos;
@@ -11,11 +12,13 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -24,12 +27,34 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.UUID;
-
 public class BarteringBlockEntity extends AbstractTradingBlockEntity {
 
     ItemStack currency;
     int currencyStored;
+
+    protected final ContainerData data = new ContainerData() {
+        @Override
+        public int get(int data) {
+            switch (data) {
+                case 0: return currency.getCount();
+                case 1: return selling.getCount();
+            }
+            return 0;
+        }
+
+        @Override
+        public void set(int key, int value) {
+            switch (key) {
+                case 0: currency.setCount(value); break;
+                case 1: selling.setCount(value); break;
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+    };
 
 
     public BarteringBlockEntity(BlockPos blockPos, BlockState blockState) {
@@ -56,6 +81,12 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         super.saveAdditional(compoundTag);
         compoundTag.put("currency", currency.save(new CompoundTag()));
         compoundTag.putInt("storedCurrency", currencyStored);
+    }
+
+    @Override
+    protected Component getDefaultName() {
+        // TODO ; add configurable name
+        return Component.literal("Bartering Station");
     }
 
     @Override
@@ -268,9 +299,78 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         }
     }
 
-    @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return Platform;
+    protected AbstractContainerMenu createMenu(int i, Inventory inventory) {
+        return BarteringMenu.realContainer(i, inventory, this, data);
+    }
+
+    /**
+     * This container only 'stores' 2 things in it, a currency and an item to be traded.
+     * The items can be stacked above 64, however.
+     * @return 2
+     */
+    @Override
+    public int getContainerSize() {
+        return 2;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return currency.isEmpty() && selling.isEmpty();
+    }
+
+    /**
+     *
+     * @param pSlot The slot to check.
+     * @return An ItemStack that shows how many items, up to 64, are in the trading block.
+     */
+    @Override
+    public ItemStack getItem(int pSlot) {
+        int take;
+        ItemStack item;
+
+        if (pSlot == 0) {
+            take = currencyStored;
+            item = getCurrency().copy();
+        } else if (pSlot == 1) {
+            take = storedSellingItems;
+            item = getSelling().copy();
+        } else {
+            return ItemStack.EMPTY;
+        }
+        item.setCount(take);
+        return item;
+    }
+
+    /**
+     * Given a slot, we will remove up to 64 items, based on how much of that item is stored.
+     * @param amountToRemove ignored. Every removal is considered to be up to a full stack.
+     * @return The ItemStack of the item to be removed.
+     */
+    @Override
+    public ItemStack removeItem(int slot, int amountToRemove) {
+        ItemStack item = getItem(slot);
+        if (slot == 0) {
+            currencyStored -= amountToRemove;
+        } else if (slot == 1) {
+            storedSellingItems -= amountToRemove;
+        }
+        // todo; this could be wrong
+        return item.split(amountToRemove);
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int slot) {
+        return removeItem(slot, 64);
+    }
+
+    @Override
+    public void setItem(int slot, ItemStack stack) {
+
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return true;
     }
 }

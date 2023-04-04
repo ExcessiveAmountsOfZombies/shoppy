@@ -15,6 +15,7 @@ public class BarteringScreen extends AbstractContainerScreen<BarteringMenu> {
 
     public BarteringScreen(BarteringMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
+        this.inventoryLabelY = -3000;
     }
 
     @Override
@@ -29,9 +30,12 @@ public class BarteringScreen extends AbstractContainerScreen<BarteringMenu> {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, CONTAINER_BACKGROUND);
-        int i = (this.width - this.imageWidth) / 2;
-        int j = (this.height - this.imageHeight) / 2;
-        this.blit(pPoseStack, i, j, 0, 0, this.imageWidth, this.containerRows * 18 + 17);
-        this.blit(pPoseStack, i, j + this.containerRows * 18 + 17, 0, 126, this.imageWidth, 96);
+        int left = leftPos;
+        int top = topPos;
+        this.blit(pPoseStack, left, top, 0, 0, 176, 147);
+        drawString(pPoseStack, font, "x" + menu.getContainerData().get(0), leftPos + 19, topPos + 22, 0xFFFFFF);
+        drawString(pPoseStack, font, "x" + menu.getContainerData().get(1), leftPos + 143, topPos + 18, 0xFFFFFF);
+        drawString(pPoseStack, font, "for", leftPos + 80, topPos + 28, 0xFFFFFF);
+        //this.blit(pPoseStack, left + 79, top + 34, 0, 126, this.imageWidth, 16);
     }
 }

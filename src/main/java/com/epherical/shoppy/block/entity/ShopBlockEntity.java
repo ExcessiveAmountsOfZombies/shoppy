@@ -60,6 +60,11 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
     }
 
     @Override
+    protected Component getDefaultName() {
+        return null;
+    }
+
+    @Override
     public void clearContent() {
         super.clearContent();
         isBuyingFromPlayer = false;
@@ -313,5 +318,45 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
         return null;
+    }
+
+    @Override
+    protected AbstractContainerMenu createMenu(int i, Inventory inventory) {
+        return null;
+    }
+
+    @Override
+    public int getContainerSize() {
+        return 0;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public ItemStack getItem(int i) {
+        return null;
+    }
+
+    @Override
+    public ItemStack removeItem(int i, int i1) {
+        return null;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int i) {
+        return null;
+    }
+
+    @Override
+    public void setItem(int i, ItemStack itemStack) {
+
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return false;
     }
 }

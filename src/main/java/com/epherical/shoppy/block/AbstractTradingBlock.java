@@ -1,8 +1,11 @@
 package com.epherical.shoppy.block;
 
 import com.epherical.shoppy.block.entity.AbstractTradingBlockEntity;
+import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen;
+import net.minecraft.client.gui.screens.inventory.FurnaceScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -13,7 +16,9 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.FurnaceBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
@@ -24,7 +29,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -59,17 +63,22 @@ public abstract class AbstractTradingBlock extends Block implements EntityBlock 
 
     @Override
     public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+        if (level.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+
         ItemStack item = player.getMainHandItem();
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
-        if (blockEntity instanceof AbstractTradingBlockEntity) {
-            AbstractTradingBlockEntity shopBlock = (AbstractTradingBlockEntity) blockEntity;
-            if ((shopBlock.getOwner().equals(player.getUUID())/* || player.hasPermissions(4)*/) && !level.isClientSide) {
+        if (blockEntity instanceof AbstractTradingBlockEntity shopBlock) {
+            player.openMenu(shopBlock);
+            return InteractionResult.CONSUME;
+            /*if ((shopBlock.getOwner().equals(player.getUUID())*//* || player.hasPermissions(4)*//*) && !level.isClientSide) {
                 return shopBlock.interactWithTradingBlock(blockState, level, blockPos, player, interactionHand, blockHitResult);
             } else {
                 if (!level.isClientSide && !shopBlock.getSelling().isEmpty()) {
                     shopBlock.attemptPurchase(player, item, false);
                 }
-            }
+            }*/
         }
         return InteractionResult.CONSUME;
     }
