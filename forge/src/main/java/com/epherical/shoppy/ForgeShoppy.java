@@ -58,11 +58,10 @@ public class ForgeShoppy extends ShoppyMod {
     public static final PermissionNode<Boolean> ADMIN_BREAK = new PermissionNode<>("shoppy", "admin.break_shop", PermissionTypes.BOOLEAN, (player, playerUUID, context) -> {
         return player != null && player.hasPermissions(4);
     });
-
-
     public static CreativeModeTab ITEM_GROUP;
 
     public ForgeShoppy() {
+        super(new ForgeNetworking(MOD_CHANNEL, "1", s -> true, s -> true));
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         bus.addListener(ForgeClient::clientSetup);
         bus.addListener(ForgeClient::registerRenderers);

@@ -1,11 +1,8 @@
 package com.epherical.shoppy.block;
 
 import com.epherical.shoppy.block.entity.AbstractTradingBlockEntity;
-import net.minecraft.client.gui.screens.inventory.AbstractFurnaceScreen;
-import net.minecraft.client.gui.screens.inventory.FurnaceScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -16,9 +13,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.FurnaceBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
@@ -66,11 +61,20 @@ public abstract class AbstractTradingBlock extends Block implements EntityBlock 
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
-
         ItemStack item = player.getMainHandItem();
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
         if (blockEntity instanceof AbstractTradingBlockEntity shopBlock) {
-            player.openMenu(shopBlock);
+            if (shopBlock.getOwner().equals(player.getUUID()) || player.hasPermissions(4) && player.isCrouching()) {
+                player.openMenu(shopBlock);
+            } else {
+                player.openMenu(shopBlock);
+            }
+            // todo; add an option for when the player is crouching, that opens the OWNER menu if they have permission
+            // todo; create a second MENU for owners of blocks.
+            // todo; buttons buttons buttons. A button will let you deposit your inventory into the shop
+            // todo; button to remove items from the shop, profits from the shop
+            // todo; after the shop is empty you will be able to change the for sale item.
+
             return InteractionResult.CONSUME;
             /*if ((shopBlock.getOwner().equals(player.getUUID())*//* || player.hasPermissions(4)*//*) && !level.isClientSide) {
                 return shopBlock.interactWithTradingBlock(blockState, level, blockPos, player, interactionHand, blockHitResult);
@@ -81,28 +85,6 @@ public abstract class AbstractTradingBlock extends Block implements EntityBlock 
             }*/
         }
         return InteractionResult.CONSUME;
-    }
-
-    /**
-     * We will use this method to display information to the owner of the shop or a potential buyer.
-     */
-    @Override
-    public void attack(BlockState blockState, Level level, BlockPos blockPos, Player player) {
-        AbstractTradingBlockEntity shopBlock = (AbstractTradingBlockEntity) level.getBlockEntity(blockPos);
-
-        if (shopBlock != null && !level.isClientSide) {
-            // owner
-            if (shopBlock.getOwner().equals(player.getUUID())) {
-                if (player.isCrouching()) {
-                    shopBlock.extractItemsFromShop(level, blockPos);
-                } else {
-                    shopBlock.sendInformationToOwner(player);
-                }
-            } else {
-                shopBlock.userLeftClickTradingBlock(blockState, level, blockPos, player);
-            }
-        }
-        super.attack(blockState, level, blockPos, player);
     }
 
     @Override

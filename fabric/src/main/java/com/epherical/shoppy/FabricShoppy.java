@@ -9,11 +9,14 @@ import com.epherical.shoppy.block.entity.BarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeBarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeShopBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
+import com.epherical.shoppy.networking.AbstractNetworking;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.Registry;
@@ -46,9 +49,15 @@ public class FabricShoppy extends ShoppyMod implements ModInitializer {
             .icon(() -> new ItemStack(BARTING_STATION_ITEM))
             .build();
 
+    public FabricShoppy() {
+        super(new FabricNetworking(MOD_CHANNEL, FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT));
+    }
+
 
     @Override
     public void onInitialize() {
+        int value = 0;
+
         BARTERING_STATION = Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation("shoppy", "bartering_station"),
                 new BarteringBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F, 1200F).sound(SoundType.WOOD).noOcclusion()));
         BARTING_STATION_ITEM = Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("shoppy", "bartering_station"),

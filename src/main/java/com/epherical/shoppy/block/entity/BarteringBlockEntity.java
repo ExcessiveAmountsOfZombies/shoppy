@@ -35,18 +35,18 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
     protected final ContainerData data = new ContainerData() {
         @Override
         public int get(int data) {
-            switch (data) {
-                case 0: return currency.getCount();
-                case 1: return selling.getCount();
-            }
-            return 0;
+            return switch (data) {
+                case 0 -> currency.getCount();
+                case 1 -> selling.getCount();
+                default -> 0;
+            };
         }
 
         @Override
         public void set(int key, int value) {
             switch (key) {
-                case 0: currency.setCount(value); break;
-                case 1: selling.setCount(value); break;
+                case 0 -> currency.setCount(value);
+                case 1 -> selling.setCount(value);
             }
         }
 
@@ -244,7 +244,7 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         if (hit.y() <= 0.5 && (this.getCurrency().isEmpty() || sameItem)) {
             if (item.getCount() == 1 && sameItem) {
                 if (currency.getCount() < currency.getMaxStackSize())
-                currency.setCount(currency.getCount() + 1);
+                    currency.setCount(currency.getCount() + 1);
                 markUpdated();
                 return InteractionResult.SUCCESS;
             } else {
@@ -299,9 +299,19 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         }
     }
 
+    @Nullable
+    @Override
+    public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+        return BarteringMenu.realContainer(i, inventory, this, data);
+    }
+
+    /**
+     * UNUSED DO NOT USE
+     * @return ALWAYS RETURNS NULL.
+     */
     @Override
     protected AbstractContainerMenu createMenu(int i, Inventory inventory) {
-        return BarteringMenu.realContainer(i, inventory, this, data);
+        return null;
     }
 
     /**

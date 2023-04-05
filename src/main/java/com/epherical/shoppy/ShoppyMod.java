@@ -11,6 +11,7 @@ import com.epherical.shoppy.block.entity.CreativeBarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeBlock;
 import com.epherical.shoppy.block.entity.CreativeShopBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
+import com.epherical.shoppy.networking.AbstractNetworking;
 import com.google.common.collect.Maps;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -20,6 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
@@ -58,9 +60,23 @@ public abstract class ShoppyMod {
     public static Economy economyInstance;
     public static Map<UUID, ShopBlockEntity> awaitingResponse = Maps.newHashMap();
 
+
+    public static final ResourceLocation MOD_CHANNEL = new ResourceLocation("shoppy", "communication");
+
+    public static ShoppyMod MOD;
+
     @Nullable
     public static UniqueUser ADMIN = null;
 
+
+    private final AbstractNetworking<?, ?> networking;
+
+    public ShoppyMod(AbstractNetworking<?, ?> networking) {
+        this.networking = networking;
+        int id = 0;
+        MOD = this;
+
+    }
 
     protected int createNPCShop(CommandContext<CommandSourceStack> stack) throws CommandSyntaxException {
         BlockPos possibleShopPos = BlockPosArgument.getLoadedBlockPos(stack, "block");
@@ -86,4 +102,7 @@ public abstract class ShoppyMod {
         return 1;
     }
 
+    public AbstractNetworking<?, ?> getNetworking() {
+        return networking;
+    }
 }
