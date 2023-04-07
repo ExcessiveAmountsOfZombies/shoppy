@@ -1,6 +1,6 @@
 package com.epherical.shoppy.block.entity;
 
-import com.epherical.shoppy.BarteringMenu;
+import com.epherical.shoppy.menu.BarteringMenu;
 import com.epherical.shoppy.ShoppyMod;
 import com.epherical.shoppy.block.AbstractTradingBlock;
 import net.minecraft.core.BlockPos;
@@ -12,7 +12,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.ContainerHelper;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
@@ -27,6 +27,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
+import static com.epherical.shoppy.menu.BarteringMenu.CURRENCY_STORED;
+import static com.epherical.shoppy.menu.BarteringMenu.SELLING_STORED;
+import static com.epherical.shoppy.menu.BarteringMenuOwner.*;
+
 public class BarteringBlockEntity extends AbstractTradingBlockEntity {
 
     ItemStack currency;
@@ -38,6 +42,8 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
             return switch (data) {
                 case 0 -> currency.getCount();
                 case 1 -> selling.getCount();
+                case 2 -> currencyStored;
+                case 3 -> storedSellingItems;
                 default -> 0;
             };
         }
@@ -47,6 +53,8 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
             switch (key) {
                 case 0 -> currency.setCount(value);
                 case 1 -> selling.setCount(value);
+                case 2 -> currencyStored = value;
+                case 3 -> storedSellingItems = value;
             }
         }
 
@@ -299,10 +307,39 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         }
     }
 
+    public boolean emptyProfits(ServerPlayer player) {
+        int itemsToTake = Math.min(64, currencyStored);
+        ItemStack currency = getCurrency().copy();
+        currency.setCount(itemsToTake);
+        currencyStored -= itemsToTake;
+        if (!player.addItem(currency)) {
+            // re-add. This will take the remaining itemstack and put it back into storage.
+            currencyStored += currency.getCount();
+            return false;
+        }
+        return true;
+    }
+
+    public boolean emptyItemsToBeSold(ServerPlayer player) {
+        int itemsToTake = Math.min(64, storedSellingItems);
+        ItemStack selling = getSelling().copy();
+        selling.setCount(itemsToTake);
+        storedSellingItems -= itemsToTake;
+        if (!player.addItem(selling)) {
+            storedSellingItems += selling.getCount();
+            return false;
+        }
+        return true;
+    }
+
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return BarteringMenu.realContainer(i, inventory, this, data);
+        if (getOwner().equals(player.getUUID())) {
+            return realContainer(i, inventory, this, data);
+        } else {
+            return BarteringMenu.realContainer(i, inventory, this, data);
+        }
     }
 
     /**
@@ -339,12 +376,18 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         int take;
         ItemStack item;
 
-        if (pSlot == 0) {
+        if (pSlot == CURRENCY_STORED) {
             take = currencyStored;
             item = getCurrency().copy();
-        } else if (pSlot == 1) {
+        } else if (pSlot == SELLING_STORED) {
             take = storedSellingItems;
             item = getSelling().copy();
+        } else if (pSlot == CURRENCY_ITEM) {
+            item = getCurrency();
+            take = getCurrency().getCount();
+        } else if (pSlot == SOLD_ITEMS) {
+            item = getSelling();
+            take = getSelling().getCount();
         } else {
             return ItemStack.EMPTY;
         }
@@ -360,12 +403,13 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
     @Override
     public ItemStack removeItem(int slot, int amountToRemove) {
         ItemStack item = getItem(slot);
-        if (slot == 0) {
+        if (slot == CURRENCY_STORED) {
             currencyStored -= amountToRemove;
-        } else if (slot == 1) {
+        } else if (slot == SELLING_STORED) {
             storedSellingItems -= amountToRemove;
         }
         // todo; this could be wrong
+        markUpdated();
         return item.split(amountToRemove);
     }
 
@@ -376,7 +420,13 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
 
     @Override
     public void setItem(int slot, ItemStack stack) {
+        if (slot == CURRENCY_ITEM) {
+            currency = stack;
+        } else if (slot == SOLD_ITEMS) {
+            selling = stack;
+        }
 
+        markUpdated();
     }
 
     @Override

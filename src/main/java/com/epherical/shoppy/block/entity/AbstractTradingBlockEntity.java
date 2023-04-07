@@ -62,7 +62,7 @@ public abstract class AbstractTradingBlockEntity extends BaseContainerBlockEntit
         selling = ItemStack.EMPTY;
     }
 
-    protected void markUpdated() {
+    public void markUpdated() {
         this.setChanged();
         this.getLevel().sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
     }
@@ -86,6 +86,7 @@ public abstract class AbstractTradingBlockEntity extends BaseContainerBlockEntit
             this.storedSellingItems += itemsInserted;
             item.shrink(itemsInserted);
 
+            markUpdated();
             return itemsInserted;
         }
         return 0;

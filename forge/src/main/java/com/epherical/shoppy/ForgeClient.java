@@ -5,7 +5,6 @@ import com.epherical.shoppy.client.render.ShopBlockRenderer;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.world.inventory.AbstractFurnaceMenu;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -24,6 +23,7 @@ public class ForgeClient {
         ItemBlockRenderTypes.setRenderLayer(ShoppyMod.CREATIVE_SHOP_BLOCK, RenderType.cutout());
 
         MenuScreens.register(ForgeShoppy.BARTERING_MENU, BarteringScreen::new);
+        MenuScreens.register(ForgeShoppy.BARTERING_MENU_OWNER, BarteringScreenOwner::new);
 
         MinecraftForge.EVENT_BUS.register(new ForgeClient());
 

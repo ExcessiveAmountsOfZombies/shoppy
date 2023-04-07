@@ -1,4 +1,4 @@
-package com.epherical.shoppy;
+package com.epherical.shoppy.menu;
 
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -16,7 +16,6 @@ public abstract class AbstractShoppyMenu extends AbstractContainerMenu {
 
         this.addDataSlots(containerData);
     }
-
 
     public ContainerData getContainerData() {
         return containerData;

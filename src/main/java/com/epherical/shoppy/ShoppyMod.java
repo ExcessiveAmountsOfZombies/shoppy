@@ -11,7 +11,12 @@ import com.epherical.shoppy.block.entity.CreativeBarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeBlock;
 import com.epherical.shoppy.block.entity.CreativeShopBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
+import com.epherical.shoppy.menu.BarteringMenu;
+import com.epherical.shoppy.menu.BarteringMenuOwner;
 import com.epherical.shoppy.networking.AbstractNetworking;
+import com.epherical.shoppy.networking.packets.AttemptPurchase;
+import com.epherical.shoppy.networking.packets.SlotManipulation;
+import com.epherical.shoppy.objects.Action;
 import com.google.common.collect.Maps;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -23,8 +28,10 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.Nullable;
@@ -56,6 +63,7 @@ public abstract class ShoppyMod {
     public static Item CREATIVE_SHOP_BLOCK_ITEM;
 
     public static MenuType<BarteringMenu> BARTERING_MENU;
+    public static MenuType<BarteringMenuOwner> BARTERING_MENU_OWNER;
 
     public static Economy economyInstance;
     public static Map<UUID, ShopBlockEntity> awaitingResponse = Maps.newHashMap();
@@ -74,6 +82,31 @@ public abstract class ShoppyMod {
     public ShoppyMod(AbstractNetworking<?, ?> networking) {
         this.networking = networking;
         int id = 0;
+        networking.registerClientToServer(id++, AttemptPurchase.class, (attemptPurchase, buf) -> {}, buf -> {
+            return new AttemptPurchase();
+        }, (attemptPurchase, context) -> {
+            ServerPlayer player = context.getPlayer();
+            if (player != null) {
+                player.getServer().execute(() -> {
+                    if (player.containerMenu instanceof BarteringMenu menu && menu.getContainer() instanceof BarteringBlockEntity blockEntity) {
+                        Inventory inventory = player.getInventory();
+                        try {
+                            // todo; an improvement could be to fix partial stacks.
+                            ItemStack item = inventory.getItem(inventory.findSlotMatchingItem(blockEntity.getCurrency()));
+                            blockEntity.attemptPurchase(player, item, false);
+                        } catch (Exception ignored) {
+
+                        }
+                    } else {
+                        // todo; throw error. someone may be trying to do something they shouldn't.
+                    }
+                });
+            }
+        });
+        networking.registerClientToServer(id++, SlotManipulation.class, (slotManipulation, buf) -> {
+            buf.writeVarInt(slotManipulation.slot());
+            buf.writeEnum(slotManipulation.action());
+        }, buf -> new SlotManipulation(buf.readVarInt(), buf.readEnum(Action.class)), SlotManipulation::handle);
         MOD = this;
 
     }

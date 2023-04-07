@@ -1,7 +1,7 @@
-package com.epherical.shoppy;
+package com.epherical.shoppy.menu;
 
+import com.epherical.shoppy.ShoppyMod;
 import net.minecraft.world.Container;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
@@ -13,39 +13,25 @@ import org.jetbrains.annotations.Nullable;
 
 public class BarteringMenu extends AbstractShoppyMenu {
 
+    public static final int CURRENCY_STORED = 0;
+    public static final int SELLING_STORED = 1;
+
+    protected Container container;
+
     public static BarteringMenu realContainer(int pContainerId, Inventory playerInventory, Container container, ContainerData containerData) {
         return new BarteringMenu(ShoppyMod.BARTERING_MENU, pContainerId, playerInventory, container, containerData);
     }
 
-    protected BarteringMenu(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory playerInventory) {
-        this(pMenuType, pContainerId, playerInventory, new SimpleContainer(2), new SimpleContainerData(2));
+    public BarteringMenu(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory playerInventory) {
+        this(pMenuType, pContainerId, playerInventory, new DenseContainer(2), new SimpleContainerData(4));
     }
 
-    protected BarteringMenu(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory playerInventory, Container container, ContainerData data) {
+    public BarteringMenu(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory playerInventory, Container container, ContainerData data) {
         super(pMenuType, pContainerId, playerInventory, data);
-        this.addSlot(new Slot(container, 0, 19, 32) {
-            @Override
-            public boolean mayPickup(Player $$0) {
+        this.container = container;
+        addSlots();
 
-                return true;
-            }
 
-            @Override
-            public boolean mayPlace(ItemStack $$0) {
-                return true;
-            }
-        });
-        this.addSlot(new Slot(container, 1, 143, 32) {
-            @Override
-            public boolean mayPickup(Player $$0) {
-                return true;
-            }
-
-            @Override
-            public boolean mayPlace(ItemStack $$0) {
-                return true;
-            }
-        });
 
         for(int rows = 0; rows < 3; ++rows) {
             for(int slots = 0; slots < 9; ++slots) {
@@ -56,6 +42,31 @@ public class BarteringMenu extends AbstractShoppyMenu {
         for(int slots = 0; slots < 9; ++slots) {
             this.addSlot(new Slot(playerInventory, slots, 8 + slots * 18, 123));
         }
+    }
+
+    protected void addSlots() {
+        this.addSlot(new Slot(container, CURRENCY_STORED, 19, 32) {
+            @Override
+            public boolean mayPickup(Player $$0) {
+                return false;
+            }
+
+            @Override
+            public boolean mayPlace(ItemStack $$0) {
+                return false;
+            }
+        });
+        this.addSlot(new Slot(container, SELLING_STORED, 143, 32) {
+            @Override
+            public boolean mayPickup(Player $$0) {
+                return false;
+            }
+
+            @Override
+            public boolean mayPlace(ItemStack $$0) {
+                return false;
+            }
+        });
     }
 
 
@@ -97,13 +108,15 @@ public class BarteringMenu extends AbstractShoppyMenu {
 
             clickedSlot.onTake(pPlayer, clickedItem);
         }
-        System.out.println(pIndex);
-        System.out.println(pPlayer);
         return item;
     }
 
     @Override
     public boolean stillValid(Player pPlayer) {
         return true;
+    }
+
+    public Container getContainer() {
+        return container;
     }
 }

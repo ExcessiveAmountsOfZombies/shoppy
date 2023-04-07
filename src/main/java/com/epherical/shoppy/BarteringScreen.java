@@ -1,7 +1,10 @@
 package com.epherical.shoppy;
 
+import com.epherical.shoppy.menu.BarteringMenu;
+import com.epherical.shoppy.networking.packets.AttemptPurchase;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
@@ -16,6 +19,14 @@ public class BarteringScreen extends AbstractContainerScreen<BarteringMenu> {
     public BarteringScreen(BarteringMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
         this.inventoryLabelY = -3000;
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+        this.addRenderableWidget(Button.builder(Component.nullToEmpty("Barter"),var1 -> {
+            ShoppyMod.MOD.getNetworking().sendToServer(new AttemptPurchase());
+        }).size(42, 20).pos(leftPos + 84, topPos + 42).build());
     }
 
     @Override
@@ -35,7 +46,7 @@ public class BarteringScreen extends AbstractContainerScreen<BarteringMenu> {
         this.blit(pPoseStack, left, top, 0, 0, 176, 147);
         drawString(pPoseStack, font, "x" + menu.getContainerData().get(0), leftPos + 19, topPos + 22, 0xFFFFFF);
         drawString(pPoseStack, font, "x" + menu.getContainerData().get(1), leftPos + 143, topPos + 18, 0xFFFFFF);
-        drawString(pPoseStack, font, "for", leftPos + 80, topPos + 28, 0xFFFFFF);
+        drawString(pPoseStack, font, "for", leftPos + 75, topPos + 28, 0xFFFFFF);
         //this.blit(pPoseStack, left + 79, top + 34, 0, 126, this.imageWidth, 16);
     }
 }

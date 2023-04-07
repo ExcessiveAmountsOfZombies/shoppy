@@ -69,10 +69,7 @@ public abstract class AbstractTradingBlock extends Block implements EntityBlock 
             } else {
                 player.openMenu(shopBlock);
             }
-            // todo; add an option for when the player is crouching, that opens the OWNER menu if they have permission
-            // todo; create a second MENU for owners of blocks.
-            // todo; buttons buttons buttons. A button will let you deposit your inventory into the shop
-            // todo; button to remove items from the shop, profits from the shop
+
             // todo; after the shop is empty you will be able to change the for sale item.
 
             return InteractionResult.CONSUME;

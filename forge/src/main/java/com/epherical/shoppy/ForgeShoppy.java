@@ -10,6 +10,8 @@ import com.epherical.shoppy.block.entity.BarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeBarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeShopBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
+import com.epherical.shoppy.menu.BarteringMenu;
+import com.epherical.shoppy.menu.BarteringMenuOwner;
 import net.minecraft.Util;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
@@ -166,6 +168,7 @@ public class ForgeShoppy extends ShoppyMod {
         public static void registerEvent(RegisterEvent event) {
             if (event.getRegistryKey().equals(ForgeRegistries.Keys.MENU_TYPES)) {
                 BARTERING_MENU = new MenuType<>((pContainerId, pPlayerInventory) -> new BarteringMenu(BARTERING_MENU, pContainerId, pPlayerInventory));
+                BARTERING_MENU_OWNER = new MenuType<>((pContainerId, pPlayerInventory) -> new BarteringMenuOwner(BARTERING_MENU_OWNER, pContainerId, pPlayerInventory));
                 event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "bartering_menu"), () -> BARTERING_MENU);
             }
             if (event.getRegistryKey().equals(ForgeRegistries.Keys.ITEMS)) {
