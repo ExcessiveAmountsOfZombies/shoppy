@@ -395,7 +395,6 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         } else if (slot == SELLING_STORED) {
             storedSellingItems -= amountToRemove;
         }
-        // todo; this could be wrong
         markUpdated();
         return item.split(amountToRemove);
     }

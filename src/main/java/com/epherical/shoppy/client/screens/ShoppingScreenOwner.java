@@ -25,7 +25,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class ShoppingScreenOwner extends AbstractContainerScreen<ShoppingMenuOwner> {
 
-    public static final ResourceLocation CONTAINER_BACKGROUND = new ResourceLocation("shoppy", "textures/gui/container/bartering_page_owner.png");
+    public static final ResourceLocation CONTAINER_BACKGROUND = new ResourceLocation("shoppy", "textures/gui/container/shopping_page_owner.png");
 
 
     public ShoppingScreenOwner(ShoppingMenuOwner pMenu, Inventory pPlayerInventory, Component pTitle) {

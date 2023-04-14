@@ -413,7 +413,6 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
         if (slot == SELLING_STORED) {
             storedSellingItems -= amountToRemove;
         }
-        // todo; this could be wrong
         markUpdated();
         return item.split(amountToRemove);
     }
