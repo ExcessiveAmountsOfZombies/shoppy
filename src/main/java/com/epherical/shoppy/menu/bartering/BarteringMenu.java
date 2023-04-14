@@ -1,6 +1,8 @@
-package com.epherical.shoppy.menu;
+package com.epherical.shoppy.menu.bartering;
 
 import com.epherical.shoppy.ShoppyMod;
+import com.epherical.shoppy.menu.AbstractShoppyMenu;
+import com.epherical.shoppy.menu.DenseContainer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -13,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class BarteringMenu extends AbstractShoppyMenu {
 
-    public static final int CURRENCY_STORED = 0;
-    public static final int SELLING_STORED = 1;
+    public static final int CURRENCY_STORED = 1;
+    public static final int SELLING_STORED = 0;
 
     protected Container container;
 
@@ -45,7 +47,7 @@ public class BarteringMenu extends AbstractShoppyMenu {
     }
 
     protected void addSlots() {
-        this.addSlot(new Slot(container, CURRENCY_STORED, 19, 32) {
+        this.addSlot(new Slot(container, SELLING_STORED, 143, 32) {
             @Override
             public boolean mayPickup(Player $$0) {
                 return false;
@@ -56,7 +58,7 @@ public class BarteringMenu extends AbstractShoppyMenu {
                 return false;
             }
         });
-        this.addSlot(new Slot(container, SELLING_STORED, 143, 32) {
+        this.addSlot(new Slot(container, CURRENCY_STORED, 19, 32) {
             @Override
             public boolean mayPickup(Player $$0) {
                 return false;

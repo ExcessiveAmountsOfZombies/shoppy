@@ -61,7 +61,6 @@ public abstract class AbstractTradingBlock extends Block implements EntityBlock 
         if (level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
-        ItemStack item = player.getMainHandItem();
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
         if (blockEntity instanceof AbstractTradingBlockEntity shopBlock) {
             if (shopBlock.getOwner().equals(player.getUUID()) || player.hasPermissions(4) && player.isCrouching()) {
@@ -69,8 +68,6 @@ public abstract class AbstractTradingBlock extends Block implements EntityBlock 
             } else {
                 player.openMenu(shopBlock);
             }
-
-            // todo; after the shop is empty you will be able to change the for sale item.
 
             return InteractionResult.CONSUME;
             /*if ((shopBlock.getOwner().equals(player.getUUID())*//* || player.hasPermissions(4)*//*) && !level.isClientSide) {

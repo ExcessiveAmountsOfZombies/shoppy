@@ -11,10 +11,13 @@ import com.epherical.shoppy.block.entity.CreativeBarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeBlock;
 import com.epherical.shoppy.block.entity.CreativeShopBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
-import com.epherical.shoppy.menu.BarteringMenu;
-import com.epherical.shoppy.menu.BarteringMenuOwner;
+import com.epherical.shoppy.menu.bartering.BarteringMenu;
+import com.epherical.shoppy.menu.bartering.BarteringMenuOwner;
+import com.epherical.shoppy.menu.shopping.ShoppingMenu;
+import com.epherical.shoppy.menu.shopping.ShoppingMenuOwner;
 import com.epherical.shoppy.networking.AbstractNetworking;
 import com.epherical.shoppy.networking.packets.AttemptPurchase;
+import com.epherical.shoppy.networking.packets.SetPrice;
 import com.epherical.shoppy.networking.packets.SlotManipulation;
 import com.epherical.shoppy.objects.Action;
 import com.google.common.collect.Maps;
@@ -64,6 +67,8 @@ public abstract class ShoppyMod {
 
     public static MenuType<BarteringMenu> BARTERING_MENU;
     public static MenuType<BarteringMenuOwner> BARTERING_MENU_OWNER;
+    public static MenuType<ShoppingMenu> SHOPPING_MENU;
+    public static MenuType<ShoppingMenuOwner> SHOPPING_MENU_OWNER;
 
     public static Economy economyInstance;
     public static Map<UUID, ShopBlockEntity> awaitingResponse = Maps.newHashMap();
@@ -107,6 +112,9 @@ public abstract class ShoppyMod {
             buf.writeVarInt(slotManipulation.slot());
             buf.writeEnum(slotManipulation.action());
         }, buf -> new SlotManipulation(buf.readVarInt(), buf.readEnum(Action.class)), SlotManipulation::handle);
+        networking.registerClientToServer(id++, SetPrice.class, (setPrice, buf) -> {
+            buf.writeVarInt(setPrice.price());
+        }, buf -> new SetPrice(buf.readVarInt()), SetPrice::handle);
         MOD = this;
 
     }

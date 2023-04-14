@@ -2,6 +2,10 @@ package com.epherical.shoppy;
 
 import com.epherical.shoppy.client.render.BarteringBlockRenderer;
 import com.epherical.shoppy.client.render.ShopBlockRenderer;
+import com.epherical.shoppy.client.screens.BarteringScreen;
+import com.epherical.shoppy.client.screens.BarteringScreenOwner;
+import com.epherical.shoppy.client.screens.ShoppingScreen;
+import com.epherical.shoppy.client.screens.ShoppingScreenOwner;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -24,6 +28,8 @@ public class ForgeClient {
 
         MenuScreens.register(ForgeShoppy.BARTERING_MENU, BarteringScreen::new);
         MenuScreens.register(ForgeShoppy.BARTERING_MENU_OWNER, BarteringScreenOwner::new);
+        MenuScreens.register(ForgeShoppy.SHOPPING_MENU, ShoppingScreen::new);
+        MenuScreens.register(ForgeShoppy.SHOPPING_MENU_OWNER, ShoppingScreenOwner::new);
 
         MinecraftForge.EVENT_BUS.register(new ForgeClient());
 

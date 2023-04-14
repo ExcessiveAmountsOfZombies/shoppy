@@ -2,6 +2,8 @@ package com.epherical.shoppy.block.entity;
 
 import com.epherical.octoecon.api.user.UniqueUser;
 import com.epherical.shoppy.ShoppyMod;
+import com.epherical.shoppy.menu.shopping.ShoppingMenu;
+import com.epherical.shoppy.menu.shopping.ShoppingMenuOwner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -14,6 +16,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -24,6 +27,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
+import static com.epherical.shoppy.menu.shopping.ShoppingMenu.SELLING_STORED;
+
 public class ShopBlockEntity extends AbstractTradingBlockEntity {
 
 
@@ -31,6 +36,32 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
 
     private boolean isBuyingFromPlayer;
     private int price;
+
+    protected final ContainerData data = new ContainerData() {
+        @Override
+        public int get(int data) {
+            return switch (data) {
+                case 0 -> selling.getCount();
+                case 1 -> storedSellingItems;
+                case 2 -> price;
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int key, int value) {
+            switch (key) {
+                case 0 -> selling.setCount(value);
+                case 1 -> storedSellingItems = value;
+                case 2 -> price = value;
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
+        }
+    };
 
 
     public ShopBlockEntity(BlockPos blockPos, BlockState blockState) {
@@ -61,7 +92,7 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
 
     @Override
     protected Component getDefaultName() {
-        return null;
+        return Component.translatable("block.shoppy.shop_block");
     }
 
     @Override
@@ -317,46 +348,94 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return null;
+        if (getOwner().equals(player.getUUID())) {
+            return ShoppingMenuOwner.realContainer(i, inventory, this, data);
+        } else {
+            return ShoppingMenu.realContainer(i, inventory, this, data);
+        }
     }
 
+    /**
+     * UNUSED DO NOT USE
+     * @return ALWAYS RETURNS NULL.
+     */
     @Override
     protected AbstractContainerMenu createMenu(int i, Inventory inventory) {
         return null;
     }
 
+    /**
+     * This container only 'stores' 2 things in it, a currency and an item to be traded.
+     * The items can be stacked above 64, however.
+     * @return 2
+     */
     @Override
     public int getContainerSize() {
-        return 0;
+        return 2;
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return selling.isEmpty();
+    }
+
+    /**
+     *
+     * @param pSlot The slot to check.
+     * @return An ItemStack that shows how many items, up to 64, are in the trading block.
+     */
+    @Override
+    public ItemStack getItem(int pSlot) {
+        int take;
+        ItemStack item;
+
+        if (pSlot == SELLING_STORED) {
+            take = storedSellingItems;
+            item = getSelling().copy();
+        } else if (pSlot == ShoppingMenuOwner.INSERTED_ITEM) {
+            item = getSelling();
+            take = getSelling().getCount();
+        } else {
+            return ItemStack.EMPTY;
+        }
+        item.setCount(take);
+        return item;
+    }
+
+    /**
+     * Given a slot, we will remove up to 64 items, based on how much of that item is stored.
+     * @param amountToRemove ignored. Every removal is considered to be up to a full stack.
+     * @return The ItemStack of the item to be removed.
+     */
+    @Override
+    public ItemStack removeItem(int slot, int amountToRemove) {
+        ItemStack item = getItem(slot);
+        if (slot == SELLING_STORED) {
+            storedSellingItems -= amountToRemove;
+        }
+        // todo; this could be wrong
+        markUpdated();
+        return item.split(amountToRemove);
     }
 
     @Override
-    public ItemStack getItem(int i) {
-        return null;
+    public ItemStack removeItemNoUpdate(int slot) {
+        return removeItem(slot, 64);
     }
 
     @Override
-    public ItemStack removeItem(int i, int i1) {
-        return null;
-    }
+    public void setItem(int slot, ItemStack stack) {
+        if (slot == ShoppingMenuOwner.INSERTED_ITEM) {
+            selling = stack;
+        }
 
-    @Override
-    public ItemStack removeItemNoUpdate(int i) {
-        return null;
-    }
-
-    @Override
-    public void setItem(int i, ItemStack itemStack) {
-
+        markUpdated();
     }
 
     @Override
     public boolean stillValid(Player player) {
-        return false;
+        return true;
     }
+
+
 }

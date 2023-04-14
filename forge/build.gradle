@@ -89,6 +89,12 @@ tasks.processResources.dependsOn(rootProject.tasks.processResources)
 
 repositories {
     mavenLocal()
+    maven {
+        url "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 jarJar.enable()
@@ -105,6 +111,7 @@ dependencies {
     }
 
     implementation fg.deobf("com.epherical.octo-economy-api:OctoEconomyApi-forge:1.1.0-1.18.2")
+    implementation(fg.deobf("curse.maven:project-559967:4007963"))
     annotationProcessor "org.spongepowered:mixin:${mixinVersion}:processor"
 }
 

@@ -1,9 +1,10 @@
-package com.epherical.shoppy;
+package com.epherical.shoppy.client.screens;
 
+import com.epherical.shoppy.ShoppyMod;
 import com.epherical.shoppy.networking.packets.SlotManipulation;
 import com.epherical.shoppy.objects.Action;
 import com.epherical.shoppy.client.widget.SmallIconButton;
-import com.epherical.shoppy.menu.BarteringMenuOwner;
+import com.epherical.shoppy.menu.bartering.BarteringMenuOwner;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Tooltip;

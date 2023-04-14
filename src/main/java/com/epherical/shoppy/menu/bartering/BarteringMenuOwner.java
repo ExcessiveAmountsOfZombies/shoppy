@@ -1,6 +1,8 @@
-package com.epherical.shoppy.menu;
+package com.epherical.shoppy.menu.bartering;
 
 import com.epherical.shoppy.ShoppyMod;
+import com.epherical.shoppy.menu.DenseContainer;
+import com.epherical.shoppy.menu.MenuOwner;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -12,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BarteringMenuOwner extends BarteringMenu {
+public class BarteringMenuOwner extends BarteringMenu implements MenuOwner {
 
     public static final int CURRENCY_ITEM = 2;
     public static final int SOLD_ITEMS = 3;

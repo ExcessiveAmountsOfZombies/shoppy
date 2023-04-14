@@ -1,6 +1,6 @@
 package com.epherical.shoppy.block.entity;
 
-import com.epherical.shoppy.menu.BarteringMenu;
+import com.epherical.shoppy.menu.bartering.BarteringMenu;
 import com.epherical.shoppy.ShoppyMod;
 import com.epherical.shoppy.block.AbstractTradingBlock;
 import net.minecraft.core.BlockPos;
@@ -27,9 +27,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-import static com.epherical.shoppy.menu.BarteringMenu.CURRENCY_STORED;
-import static com.epherical.shoppy.menu.BarteringMenu.SELLING_STORED;
-import static com.epherical.shoppy.menu.BarteringMenuOwner.*;
+import static com.epherical.shoppy.menu.bartering.BarteringMenu.CURRENCY_STORED;
+import static com.epherical.shoppy.menu.bartering.BarteringMenu.SELLING_STORED;
+import static com.epherical.shoppy.menu.bartering.BarteringMenuOwner.*;
 
 public class BarteringBlockEntity extends AbstractTradingBlockEntity {
 
@@ -60,7 +60,7 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
 
         @Override
         public int getCount() {
-            return 2;
+            return 4;
         }
     };
 
@@ -93,8 +93,7 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
 
     @Override
     protected Component getDefaultName() {
-        // TODO ; add configurable name
-        return Component.literal("Bartering Station");
+        return Component.translatable("block.shoppy.bartering_station");
     }
 
     @Override
@@ -315,18 +314,6 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         if (!player.addItem(currency)) {
             // re-add. This will take the remaining itemstack and put it back into storage.
             currencyStored += currency.getCount();
-            return false;
-        }
-        return true;
-    }
-
-    public boolean emptyItemsToBeSold(ServerPlayer player) {
-        int itemsToTake = Math.min(64, storedSellingItems);
-        ItemStack selling = getSelling().copy();
-        selling.setCount(itemsToTake);
-        storedSellingItems -= itemsToTake;
-        if (!player.addItem(selling)) {
-            storedSellingItems += selling.getCount();
             return false;
         }
         return true;

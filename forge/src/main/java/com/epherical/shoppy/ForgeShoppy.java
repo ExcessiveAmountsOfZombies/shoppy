@@ -10,8 +10,10 @@ import com.epherical.shoppy.block.entity.BarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeBarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeShopBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
-import com.epherical.shoppy.menu.BarteringMenu;
-import com.epherical.shoppy.menu.BarteringMenuOwner;
+import com.epherical.shoppy.menu.bartering.BarteringMenu;
+import com.epherical.shoppy.menu.bartering.BarteringMenuOwner;
+import com.epherical.shoppy.menu.shopping.ShoppingMenu;
+import com.epherical.shoppy.menu.shopping.ShoppingMenuOwner;
 import net.minecraft.Util;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
@@ -169,7 +171,12 @@ public class ForgeShoppy extends ShoppyMod {
             if (event.getRegistryKey().equals(ForgeRegistries.Keys.MENU_TYPES)) {
                 BARTERING_MENU = new MenuType<>((pContainerId, pPlayerInventory) -> new BarteringMenu(BARTERING_MENU, pContainerId, pPlayerInventory));
                 BARTERING_MENU_OWNER = new MenuType<>((pContainerId, pPlayerInventory) -> new BarteringMenuOwner(BARTERING_MENU_OWNER, pContainerId, pPlayerInventory));
+                SHOPPING_MENU = new MenuType<>((pContainerId, pPlayerInventory) -> new ShoppingMenu(SHOPPING_MENU, pContainerId, pPlayerInventory));
+                SHOPPING_MENU_OWNER = new MenuType<>((pContainerId, pPlayerInventory) -> new ShoppingMenuOwner(SHOPPING_MENU_OWNER, pContainerId, pPlayerInventory));
                 event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "bartering_menu"), () -> BARTERING_MENU);
+                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "bartering_menu_owner"), () -> BARTERING_MENU_OWNER);
+                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "shopping_menu"), () ->SHOPPING_MENU);
+                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "shopping_menu_owner"), () -> SHOPPING_MENU_OWNER);
             }
             if (event.getRegistryKey().equals(ForgeRegistries.Keys.ITEMS)) {
                 BARTING_STATION_ITEM = new BlockItem(BARTERING_STATION, new Item.Properties());

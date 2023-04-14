@@ -1,6 +1,7 @@
-package com.epherical.shoppy;
+package com.epherical.shoppy.client.screens;
 
-import com.epherical.shoppy.menu.BarteringMenu;
+import com.epherical.shoppy.ShoppyMod;
+import com.epherical.shoppy.menu.bartering.BarteringMenu;
 import com.epherical.shoppy.networking.packets.AttemptPurchase;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;

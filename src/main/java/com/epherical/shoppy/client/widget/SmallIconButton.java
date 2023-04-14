@@ -1,6 +1,6 @@
 package com.epherical.shoppy.client.widget;
 
-import com.epherical.shoppy.BarteringScreenOwner;
+import com.epherical.shoppy.client.screens.BarteringScreenOwner;
 import com.epherical.shoppy.objects.Action;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;

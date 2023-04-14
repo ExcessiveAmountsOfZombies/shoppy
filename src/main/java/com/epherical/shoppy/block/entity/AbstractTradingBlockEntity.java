@@ -4,6 +4,7 @@ import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Clearable;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
@@ -129,6 +130,18 @@ public abstract class AbstractTradingBlockEntity extends BaseContainerBlockEntit
         }
 
         return list;
+    }
+
+    public boolean emptyItemsToBeSold(ServerPlayer player) {
+        int itemsToTake = Math.min(64, storedSellingItems);
+        ItemStack selling = getSelling().copy();
+        selling.setCount(itemsToTake);
+        storedSellingItems -= itemsToTake;
+        if (!player.addItem(selling)) {
+            storedSellingItems += selling.getCount();
+            return false;
+        }
+        return true;
     }
 
     public void addSellingItem(ItemStack item) {
