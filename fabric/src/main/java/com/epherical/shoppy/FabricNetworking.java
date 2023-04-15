@@ -36,13 +36,12 @@ public class FabricNetworking extends AbstractNetworking<ClientPlayNetworking.Pl
                 T apply = packetWrapper.decoder.apply(buf);
                 packetWrapper.consumer.accept(apply, new Context<>(Side.CLIENT, null));
             });
-        } else {
-            ServerPlayNetworking.registerGlobalReceiver(modChannel, (server, player, handler, buf, responseSender) -> {
-                PacketWrapper<T, PlayChannelHandler> packetWrapper = (PacketWrapper<T, PlayChannelHandler>) indices.get(buf.readVarInt());
-                T apply = packetWrapper.decoder.apply(buf);
-                packetWrapper.consumer.accept(apply, new Context<>(Side.SERVER, player));
-            });
         }
+        ServerPlayNetworking.registerGlobalReceiver(modChannel, (server, player, handler, buf, responseSender) -> {
+            PacketWrapper<T, PlayChannelHandler> packetWrapper = (PacketWrapper<T, PlayChannelHandler>) indices.get(buf.readVarInt());
+            T apply = packetWrapper.decoder.apply(buf);
+            packetWrapper.consumer.accept(apply, new Context<>(Side.SERVER, player));
+        });
     }
 
     @Override
@@ -57,19 +56,15 @@ public class FabricNetworking extends AbstractNetworking<ClientPlayNetworking.Pl
     }
 
     public <T> void sendToClient(T type, ServerPlayer serverPlayer) {
-        if (ServerPlayNetworking.canSend(serverPlayer, modChannel)) {
-            FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-            assemblePacket(type, buf);
-            ServerPlayNetworking.send(serverPlayer, modChannel, buf);
-        }
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        assemblePacket(type, buf);
+        ServerPlayNetworking.send(serverPlayer, modChannel, buf);
     }
 
     public <T> void sendToServer(T type) {
-        if (ClientPlayNetworking.canSend(modChannel)) {
-            FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-            assemblePacket(type, buf);
-            ClientPlayNetworking.send(modChannel, buf);
-        }
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        assemblePacket(type, buf);
+        ClientPlayNetworking.send(modChannel, buf);
     }
 
     private <T> void assemblePacket(T type, FriendlyByteBuf buf) {

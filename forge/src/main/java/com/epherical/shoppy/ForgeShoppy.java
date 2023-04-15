@@ -83,41 +83,6 @@ public class ForgeShoppy extends ShoppyMod {
     }
 
     @SubscribeEvent
-    public void onChat(ServerChatEvent event) {
-        ServerPlayer player = event.getPlayer();
-        String msg = event.getMessage().getString();
-        if (awaitingResponse.containsKey(player.getUUID())) {
-            ShopBlockEntity shopBlock = awaitingResponse.get(player.getUUID());
-            try {
-                int number = Integer.parseInt(msg);
-                if (number >= 0) {
-                    shopBlock.setPrice(number);
-                    Component compText = economyInstance.getDefaultCurrency().format(number);
-                    Component success = Component.translatable("shop.pricing.owner.update_complete", compText).setStyle(APPROVAL_STYLE);
-                    player.sendSystemMessage(success);
-                    awaitingResponse.remove(player.getUUID());
-                    event.setCanceled(true);
-                }
-            } catch (NumberFormatException ignored) {
-                awaitingResponse.remove(player.getUUID());
-                Component message = Component.translatable("shop.pricing.owner.update_fail", msg).setStyle(ERROR_STYLE);
-                MutableComponent error = Component.literal("");
-                for (char c : msg.toCharArray()) {
-                    if (Character.isDigit(c)) {
-                        error.append(Component.literal(String.valueOf(c)).setStyle(APPROVAL_STYLE));
-                    } else {
-                        error.append(Component.literal(String.valueOf(c)).setStyle(ERROR_STYLE));
-                    }
-                }
-                Component otherMessage = Component.translatable("Errors Indicated in red: %s", error).setStyle(CONSTANTS_STYLE);
-                player.sendSystemMessage(message);
-                player.sendSystemMessage(otherMessage);
-                event.setCanceled(true);
-            }
-        }
-    }
-
-    @SubscribeEvent
     public void registerCommands(RegisterCommandsEvent event) {
         event.getDispatcher().register(literal("shoppy")
                 .requires(commandSourceStack -> commandSourceStack.hasPermission(4))

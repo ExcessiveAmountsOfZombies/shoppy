@@ -3,12 +3,17 @@ package com.epherical.shoppy.client;
 import com.epherical.shoppy.ShoppyMod;
 import com.epherical.shoppy.client.render.BarteringBlockRenderer;
 import com.epherical.shoppy.client.render.ShopBlockRenderer;
+import com.epherical.shoppy.client.screens.BarteringScreen;
+import com.epherical.shoppy.client.screens.BarteringScreenOwner;
+import com.epherical.shoppy.client.screens.ShoppingScreen;
+import com.epherical.shoppy.client.screens.ShoppingScreenOwner;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderType;
 
 @Environment(EnvType.CLIENT)
@@ -31,5 +36,10 @@ public class FabricClient extends ShoppyClient implements ClientModInitializer {
         BlockEntityRendererRegistry.register(ShoppyMod.SHOP_BLOCK_ENTITY, ShopBlockRenderer::new);
         BlockEntityRendererRegistry.register(ShoppyMod.CREATIVE_BARTERING_STATION_ENTITY, BarteringBlockRenderer::new);
         BlockEntityRendererRegistry.register(ShoppyMod.CREATIVE_SHOP_BLOCK_ENTITY, ShopBlockRenderer::new);
+
+        MenuScreens.register(ShoppyMod.BARTERING_MENU, BarteringScreen::new);
+        MenuScreens.register(ShoppyMod.BARTERING_MENU_OWNER, BarteringScreenOwner::new);
+        MenuScreens.register(ShoppyMod.SHOPPING_MENU, ShoppingScreen::new);
+        MenuScreens.register(ShoppyMod.SHOPPING_MENU_OWNER, ShoppingScreenOwner::new);
     }
 }

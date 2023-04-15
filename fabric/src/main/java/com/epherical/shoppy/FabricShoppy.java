@@ -9,21 +9,24 @@ import com.epherical.shoppy.block.entity.BarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeBarteringBlockEntity;
 import com.epherical.shoppy.block.entity.CreativeShopBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
-import com.epherical.shoppy.networking.AbstractNetworking;
+import com.epherical.shoppy.menu.bartering.BarteringMenu;
+import com.epherical.shoppy.menu.bartering.BarteringMenuOwner;
+import com.epherical.shoppy.menu.shopping.ShoppingMenu;
+import com.epherical.shoppy.menu.shopping.ShoppingMenuOwner;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.Util;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -86,6 +89,15 @@ public class FabricShoppy extends ShoppyMod implements ModInitializer {
         CREATIVE_SHOP_BLOCK_ENTITY = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, new ResourceLocation("shoppy", "creative_shop_block_entity"),
                 FabricBlockEntityTypeBuilder.create(CreativeShopBlockEntity::new, CREATIVE_SHOP_BLOCK).build());
 
+        BARTERING_MENU = Registry.register(BuiltInRegistries.MENU, new ResourceLocation("shoppy", "bartering_menu"),
+                new MenuType<>((pContainerId, pPlayerInventory) -> new BarteringMenu(BARTERING_MENU, pContainerId, pPlayerInventory)));
+        BARTERING_MENU_OWNER = Registry.register(BuiltInRegistries.MENU, new ResourceLocation("shoppy", "bartering_menu_owner"),
+                new MenuType<>((pContainerId, pPlayerInventory) -> new BarteringMenuOwner(BARTERING_MENU_OWNER, pContainerId, pPlayerInventory)));
+        SHOPPING_MENU = Registry.register(BuiltInRegistries.MENU, new ResourceLocation("shoppy", "shopping_menu"),
+                new MenuType<>((pContainerId, pPlayerInventory) -> new ShoppingMenu(SHOPPING_MENU, pContainerId, pPlayerInventory)));
+        SHOPPING_MENU_OWNER = Registry.register(BuiltInRegistries.MENU, new ResourceLocation("shoppy", "shopping_menu_owner"),
+                new MenuType<>((pContainerId, pPlayerInventory) -> new ShoppingMenuOwner(SHOPPING_MENU_OWNER, pContainerId, pPlayerInventory)));
+
 
         EconomyEvents.ECONOMY_CHANGE_EVENT.register(economy -> {
             economyInstance = economy;
@@ -93,40 +105,6 @@ public class FabricShoppy extends ShoppyMod implements ModInitializer {
             if (ADMIN != null) {
                 ADMIN.depositMoney(economyInstance.getDefaultCurrency(), 240204204, "admin account");
             }
-        });
-
-        ServerMessageEvents.ALLOW_CHAT_MESSAGE.register((msg, player, params) -> {
-            if (awaitingResponse.containsKey(player.getUUID())) {
-                ShopBlockEntity shopBlock = awaitingResponse.get(player.getUUID());
-                try {
-                    int number = Integer.parseInt(msg.signedContent());
-                    if (number >= 0) {
-                        shopBlock.setPrice(number);
-                        Component compText = economyInstance.getDefaultCurrency().format(number);
-                        Component success = Component.translatable("shop.pricing.owner.update_complete", compText).setStyle(APPROVAL_STYLE);
-                        player.sendSystemMessage(success);
-                        awaitingResponse.remove(player.getUUID());
-                        return false;
-                    }
-                } catch (NumberFormatException ignored) {
-                    awaitingResponse.remove(player.getUUID());
-                    Component message = Component.translatable("shop.pricing.owner.update_fail", msg.signedContent()).setStyle(ERROR_STYLE);
-                    String content = msg.signedContent();
-                    MutableComponent error = Component.literal("");
-                    for (char c : content.toCharArray()) {
-                        if (Character.isDigit(c)) {
-                            error.append(Component.literal(String.valueOf(c)).setStyle(APPROVAL_STYLE));
-                        } else {
-                            error.append(Component.literal(String.valueOf(c)).setStyle(ERROR_STYLE));
-                        }
-                    }
-                    Component otherMessage = Component.translatable("Errors Indicated in red: %s", error).setStyle(CONSTANTS_STYLE);
-                    player.sendSystemMessage(message);
-                    player.sendSystemMessage(otherMessage);
-                    return false;
-                }
-            }
-            return true;
         });
 
         CommandRegistrationCallback.EVENT.register((dispatcher, commandBuildContext, commandSelection) -> {
