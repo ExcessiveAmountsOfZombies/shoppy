@@ -44,6 +44,7 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
                 case 0 -> selling.getCount();
                 case 1 -> storedSellingItems;
                 case 2 -> price;
+                case 3 -> isBuyingFromPlayer ? 1 : 0;
                 default -> 0;
             };
         }
@@ -54,12 +55,13 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
                 case 0 -> selling.setCount(value);
                 case 1 -> storedSellingItems = value;
                 case 2 -> price = value;
+                case 3 -> isBuyingFromPlayer = value != 0;
             }
         }
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
     };
 
@@ -103,7 +105,13 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
     }
 
     @Override
-    public boolean attemptPurchase(Player player, ItemStack currencyInHand, boolean creativeBlock) {
+    public boolean attemptPurchase(Player player, boolean creativeBlock) {
+        ItemStack currencyInHand = ItemStack.EMPTY;
+        try {
+            Inventory inventory = player.getInventory();
+            currencyInHand = inventory.getItem(inventory.findSlotMatchingItem(selling));
+        } catch (ArrayIndexOutOfBoundsException ignored) {}
+
         Player owner = level.getServer().getPlayerList().getPlayer(this.owner);
         if (ShoppyMod.economyInstance == null) {
             Component noEconomy = Component.translatable("shop.error.no_economy").setStyle(ShoppyMod.ERROR_STYLE);
@@ -327,7 +335,7 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
         return tag;
     }
 
-    private void updateTradingStatus(boolean value) {
+    public void updateTradingStatus(boolean value) {
         this.isBuyingFromPlayer = value;
         markUpdated();
     }

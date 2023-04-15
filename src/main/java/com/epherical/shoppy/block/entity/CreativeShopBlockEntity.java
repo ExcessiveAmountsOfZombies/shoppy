@@ -3,7 +3,6 @@ package com.epherical.shoppy.block.entity;
 import com.epherical.shoppy.ShoppyMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -27,8 +26,8 @@ public class CreativeShopBlockEntity extends ShopBlockEntity implements Creative
     }
 
     @Override
-    public boolean attemptPurchase(Player player, ItemStack currencyInHand, boolean creativeBlock) {
-        boolean value = super.attemptPurchase(player, currencyInHand, true);
+    public boolean attemptPurchase(Player player, boolean creativeBlock) {
+        boolean value = super.attemptPurchase(player, true);
         keepShopOpen();
         return value;
     }

@@ -68,7 +68,7 @@ public abstract class AbstractTradingBlockEntity extends BaseContainerBlockEntit
         this.getLevel().sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
     }
 
-    public abstract boolean attemptPurchase(Player player, ItemStack currencyInHand, boolean creativeBlock);
+    public abstract boolean attemptPurchase(Player player, boolean creativeBlock);
 
     public abstract void sendInformationToOwner(Player player);
 

@@ -19,7 +19,7 @@ public class ShoppingMenuOwner extends ShoppingMenu implements MenuOwner {
     public static final int INSERTED_ITEM = 1;
 
     public ShoppingMenuOwner(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory playerInventory) {
-        this(pMenuType, pContainerId, playerInventory, new DenseContainer(2), new SimpleContainerData(3));
+        this(pMenuType, pContainerId, playerInventory, new DenseContainer(2), new SimpleContainerData(4));
     }
 
     public ShoppingMenuOwner(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory playerInventory, Container container, ContainerData data) {
@@ -32,7 +32,17 @@ public class ShoppingMenuOwner extends ShoppingMenu implements MenuOwner {
 
     @Override
     protected void addSlots() {
-        super.addSlots();
+        this.addSlot(new Slot(container, SELLING_STORED, 19, 32) {
+            @Override
+            public boolean mayPickup(Player player) {
+                return false;
+            }
+
+            @Override
+            public boolean mayPlace(ItemStack itemStack) {
+                return false;
+            }
+        });
         this.addSlot(new Slot(container, INSERTED_ITEM, 71, 32) {
             @Override
             public boolean mayPickup(@NotNull Player player) {

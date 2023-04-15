@@ -133,7 +133,9 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
     }
 
     @Override
-    public boolean attemptPurchase(Player player, ItemStack currencyInHand, boolean creativeBlock) {
+    public boolean attemptPurchase(Player player, boolean creativeBlock) {
+        Inventory inventory = player.getInventory();
+        ItemStack currencyInHand = inventory.getItem(inventory.findSlotMatchingItem(currency));
         Player owner = level.getServer().getPlayerList().getPlayer(this.owner);
         if (ItemStack.isSameItemSameTags(currencyInHand, currency)) {
             int price = currency.getCount();

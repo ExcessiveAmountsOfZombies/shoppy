@@ -1,8 +1,11 @@
 package com.epherical.shoppy.block;
 
+import com.epherical.shoppy.ShoppyMod;
 import com.epherical.shoppy.block.entity.AbstractTradingBlockEntity;
+import com.epherical.shoppy.block.entity.ShopBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -62,11 +65,21 @@ public abstract class AbstractTradingBlock extends Block implements EntityBlock 
             return InteractionResult.SUCCESS;
         }
         BlockEntity blockEntity = level.getBlockEntity(blockPos);
-        if (blockEntity instanceof AbstractTradingBlockEntity shopBlock) {
-            if (shopBlock.getOwner().equals(player.getUUID()) || player.hasPermissions(4) && player.isCrouching()) {
-                player.openMenu(shopBlock);
-            } else {
-                player.openMenu(shopBlock);
+        if (blockEntity instanceof AbstractTradingBlockEntity tradingBlock) {
+            if (!player.isCrouching()) {
+                player.openMenu(tradingBlock);
+            } else  {
+                if (tradingBlock instanceof ShopBlockEntity shopBlock && shopBlock.getOwner().equals(player.getUUID())) {
+                    shopBlock.updateTradingStatus(!shopBlock.isBuyingFromPlayer());
+                    Component status;
+                    if (shopBlock.isBuyingFromPlayer()) {
+                        status = Component.translatable("shop.status.buying").setStyle(ShoppyMod.VARIABLE_STYLE);
+                    } else {
+                        status = Component.translatable("shop.status.selling").setStyle(ShoppyMod.VARIABLE_STYLE);
+                    }
+                    Component update = Component.translatable("shop.status.update", status).setStyle(ShoppyMod.CONSTANTS_STYLE);
+                    player.sendSystemMessage(update);
+                }
             }
 
             return InteractionResult.CONSUME;

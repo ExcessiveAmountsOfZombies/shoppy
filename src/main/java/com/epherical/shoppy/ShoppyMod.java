@@ -89,25 +89,7 @@ public abstract class ShoppyMod {
         int id = 0;
         networking.registerClientToServer(id++, AttemptPurchase.class, (attemptPurchase, buf) -> {}, buf -> {
             return new AttemptPurchase();
-        }, (attemptPurchase, context) -> {
-            ServerPlayer player = context.getPlayer();
-            if (player != null) {
-                player.getServer().execute(() -> {
-                    if (player.containerMenu instanceof BarteringMenu menu && menu.getContainer() instanceof BarteringBlockEntity blockEntity) {
-                        Inventory inventory = player.getInventory();
-                        try {
-                            // todo; an improvement could be to fix partial stacks.
-                            ItemStack item = inventory.getItem(inventory.findSlotMatchingItem(blockEntity.getCurrency()));
-                            blockEntity.attemptPurchase(player, item, false);
-                        } catch (Exception ignored) {
-
-                        }
-                    } else {
-                        // todo; throw error. someone may be trying to do something they shouldn't.
-                    }
-                });
-            }
-        });
+        }, AttemptPurchase::handle);
         networking.registerClientToServer(id++, SlotManipulation.class, (slotManipulation, buf) -> {
             buf.writeVarInt(slotManipulation.slot());
             buf.writeEnum(slotManipulation.action());

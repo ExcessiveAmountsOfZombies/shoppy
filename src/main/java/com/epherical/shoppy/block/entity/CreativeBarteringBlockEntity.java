@@ -32,8 +32,8 @@ public class CreativeBarteringBlockEntity extends BarteringBlockEntity implement
     }
 
     @Override
-    public boolean attemptPurchase(Player player, ItemStack currencyInHand, boolean creativeBlock) {
-        boolean value = super.attemptPurchase(player, currencyInHand, true);
+    public boolean attemptPurchase(Player player, boolean creativeBlock) {
+        boolean value = super.attemptPurchase(player, true);
         this.currencyStored = maxStorage;
         this.storedSellingItems = maxStorage;
         return value;

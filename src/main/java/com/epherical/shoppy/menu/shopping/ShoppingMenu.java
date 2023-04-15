@@ -2,6 +2,7 @@ package com.epherical.shoppy.menu.shopping;
 
 import com.epherical.shoppy.ShoppyMod;
 import com.epherical.shoppy.menu.AbstractShoppyMenu;
+import com.epherical.shoppy.menu.ContainerMenu;
 import com.epherical.shoppy.menu.DenseContainer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -13,7 +14,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public class ShoppingMenu extends AbstractShoppyMenu {
+public class ShoppingMenu extends AbstractShoppyMenu implements ContainerMenu {
 
     public static final int SELLING_STORED = 0;
 
@@ -24,7 +25,7 @@ public class ShoppingMenu extends AbstractShoppyMenu {
     }
 
     public ShoppingMenu(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory playerInventory) {
-        this(pMenuType, pContainerId, playerInventory, new DenseContainer(1), new SimpleContainerData(3));
+        this(pMenuType, pContainerId, playerInventory, new DenseContainer(1), new SimpleContainerData(4));
     }
 
     public ShoppingMenu(@Nullable MenuType<?> pMenuType, int pContainerId, Inventory playerInventory, Container container, ContainerData data) {
@@ -44,7 +45,7 @@ public class ShoppingMenu extends AbstractShoppyMenu {
     }
 
     protected void addSlots() {
-        this.addSlot(new Slot(container, SELLING_STORED, 19, 32) {
+        this.addSlot(new Slot(container, SELLING_STORED, 80, 18) {
             @Override
             public boolean mayPickup(Player player) {
                 return false;

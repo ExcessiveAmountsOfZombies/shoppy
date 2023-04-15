@@ -17,6 +17,11 @@ public class ShoppingScreen extends AbstractContainerScreen<ShoppingMenu> {
 
     private static final ResourceLocation CONTAINER_BACKGROUND = new ResourceLocation("shoppy", "textures/gui/container/shopping_page.png");
 
+    private static final Component buying = Component.translatable("common.station.message_buying");
+    private static final Component selling = Component.translatable("common.station.message_selling");
+
+    private Button button;
+
 
     public ShoppingScreen(ShoppingMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
@@ -26,13 +31,19 @@ public class ShoppingScreen extends AbstractContainerScreen<ShoppingMenu> {
     @Override
     protected void init() {
         super.init();
-        this.addRenderableWidget(Button.builder(Component.nullToEmpty("Barter"),var1 -> {
+
+        button = this.addRenderableWidget(Button.builder(selling,var1 -> {
             ShoppyMod.MOD.getNetworking().sendToServer(new AttemptPurchase());
-        }).size(42, 20).pos(leftPos + 84, topPos + 42).build());
+        }).size(64, 20).pos(leftPos + 7, topPos + 38).build());
     }
 
     @Override
     public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
+        if (menu.getContainerData().get(3) == 1) {
+            button.setMessage(buying);
+        } else {
+            button.setMessage(selling);
+        }
         this.renderBackground(pPoseStack);
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
         this.renderTooltip(pPoseStack, pMouseX, pMouseY);
@@ -46,9 +57,9 @@ public class ShoppingScreen extends AbstractContainerScreen<ShoppingMenu> {
         int left = leftPos;
         int top = topPos;
         this.blit(pPoseStack, left, top, 0, 0, 176, 147);
-        drawString(pPoseStack, font, "x" + menu.getContainerData().get(0), leftPos + 19, topPos + 22, 0xFFFFFF);
-        drawString(pPoseStack, font, "x" + menu.getContainerData().get(1), leftPos + 143, topPos + 18, 0xFFFFFF);
-        drawString(pPoseStack, font, "for", leftPos + 75, topPos + 28, 0xFFFFFF);
+        drawString(pPoseStack, font, "x" + menu.getContainerData().get(0), leftPos + 74, topPos + 45, 0xFFFFFF);
+        drawString(pPoseStack, font, String.valueOf(menu.getContainerData().get(2)), leftPos + 143, topPos + 45, 0xFFFFFF);
+        drawString(pPoseStack, font, "for", leftPos + 106, topPos + 45, 0xFFFFFF);
         //this.blit(pPoseStack, left + 79, top + 34, 0, 126, this.imageWidth, 16);
     }
 }
