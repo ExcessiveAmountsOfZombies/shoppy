@@ -1,5 +1,6 @@
 package com.epherical.shoppy;
 
+import com.epherical.epherolib.networking.AbstractNetworking;
 import com.epherical.octoecon.api.Economy;
 import com.epherical.octoecon.api.user.UniqueUser;
 import com.epherical.shoppy.block.AbstractTradingBlock;
@@ -15,7 +16,6 @@ import com.epherical.shoppy.menu.bartering.BarteringMenu;
 import com.epherical.shoppy.menu.bartering.BarteringMenuOwner;
 import com.epherical.shoppy.menu.shopping.ShoppingMenu;
 import com.epherical.shoppy.menu.shopping.ShoppingMenuOwner;
-import com.epherical.shoppy.networking.AbstractNetworking;
 import com.epherical.shoppy.networking.packets.AttemptPurchase;
 import com.epherical.shoppy.networking.packets.SetPrice;
 import com.epherical.shoppy.networking.packets.SlotManipulation;
@@ -31,10 +31,8 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.Nullable;
@@ -104,7 +102,7 @@ public abstract class ShoppyMod {
     protected int createNPCShop(CommandContext<CommandSourceStack> stack) throws CommandSyntaxException {
         BlockPos possibleShopPos = BlockPosArgument.getLoadedBlockPos(stack, "block");
         ServerPlayer player = stack.getSource().getPlayerOrException();
-        BlockEntity blockEntity = player.getLevel().getBlockEntity(possibleShopPos);
+        BlockEntity blockEntity = player.level().getBlockEntity(possibleShopPos);
         if (blockEntity instanceof CreativeBlock creativeBlock) {
             if (ADMIN != null) {
                 creativeBlock.setOwner(ADMIN.getUserID());
@@ -118,7 +116,7 @@ public abstract class ShoppyMod {
     protected int createAdminShop(CommandContext<CommandSourceStack> stack) throws CommandSyntaxException {
         BlockPos possibleShopPos = BlockPosArgument.getLoadedBlockPos(stack, "block");
         ServerPlayer player = stack.getSource().getPlayerOrException();
-        BlockEntity blockEntity = player.getLevel().getBlockEntity(possibleShopPos);
+        BlockEntity blockEntity = player.level().getBlockEntity(possibleShopPos);
         if (ADMIN != null && blockEntity instanceof CreativeBlock creativeBlock && creativeBlock.getOwner().equals(ADMIN.getUserID())) {
             creativeBlock.setOwner(player.getUUID());
         }

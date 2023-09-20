@@ -1,22 +1,10 @@
-buildscript {
-    repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        maven { url= 'https://repo.spongepowered.org/repository/maven-public/' }
-        maven { url = 'https://maven.parchmentmc.org' }
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1+', changing: true
-        classpath 'gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0'
-        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
-    }
-}
-
 plugins {
-    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle'
+    id 'org.spongepowered.mixin'
+    id 'com.github.johnrengelman.shadow' version '8.0.0'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
 }
 
 apply plugin: 'org.spongepowered.mixin'
@@ -33,7 +21,8 @@ configurations {
 
 minecraft {
     //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    mappings channel: 'parchment', version: "${project.parchmentVersion}-${project.minecraftVersion}"
+    mappings channel: 'official', version: "${project.minecraftVersion}"
+    //mappings channel: 'parchment', version: "${project.parchmentVersion}-${project.minecraftVersion}"
     runs {
         client {
             workingDirectory project.file('run')
@@ -90,6 +79,10 @@ tasks.processResources.dependsOn(rootProject.tasks.processResources)
 repositories {
     mavenLocal()
     maven {
+        name "Epherical Maven"
+        url "https://maven.epherical.com/releases"
+    }
+    maven {
         url "https://www.cursemaven.com"
         content {
             includeGroup "curse.maven"
@@ -106,13 +99,13 @@ dependencies {
         transitive = false
     }
 
-    jarJar(group: 'com.epherical.octo-economy-api', name: 'OctoEconomyApi-forge', version: '[1.0,)') {
-        transitive = false
-    }
-
-    implementation fg.deobf("com.epherical.octo-economy-api:OctoEconomyApi-forge:1.1.0-1.18.2")
+    implementation(('com.epherical.epherolib:EpheroLib-forge:1.0.0-1.20.1'))
+    implementation("com.epherical.octo-economy-api:OctoEconomyApi-forge:1.1.0-1.18.2")
     implementation(fg.deobf("curse.maven:project-559967:4007963"))
     annotationProcessor "org.spongepowered:mixin:${mixinVersion}:processor"
+    jarJar(group: 'com.epherical.octo-economy-api', name: 'OctoEconomyApi-forge', version: '[1.1,)') {
+        transitive = false
+    }
 }
 
 tasks.withType(JavaCompile) {
@@ -154,9 +147,10 @@ reobf {
 
 jar.finalizedBy('reobfJar')
 tasks.jarJar.finalizedBy('reobfJarJar')
+shadowJar.dependsOn('reobfJar')
 
 task sourceJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from sourceSets.main.allSource
 }
 

@@ -1,9 +1,9 @@
 package com.epherical.shoppy.networking.packets;
 
 
+import com.epherical.epherolib.networking.AbstractNetworking;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
 import com.epherical.shoppy.menu.shopping.ShoppingMenuOwner;
-import com.epherical.shoppy.networking.AbstractNetworking;
 import net.minecraft.server.level.ServerPlayer;
 
 public record SetPrice(int price) {

@@ -1,5 +1,6 @@
 package com.epherical.shoppy.networking.packets;
 
+import com.epherical.epherolib.networking.AbstractNetworking;
 import com.epherical.shoppy.block.entity.AbstractTradingBlockEntity;
 import com.epherical.shoppy.block.entity.BarteringBlockEntity;
 import com.epherical.shoppy.block.entity.ShopBlockEntity;
@@ -7,7 +8,6 @@ import com.epherical.shoppy.menu.MenuOwner;
 import com.epherical.shoppy.menu.bartering.BarteringMenu;
 import com.epherical.shoppy.menu.bartering.BarteringMenuOwner;
 import com.epherical.shoppy.menu.shopping.ShoppingMenuOwner;
-import com.epherical.shoppy.networking.AbstractNetworking;
 import com.epherical.shoppy.objects.Action;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;

@@ -40,3 +40,9 @@ while bartering can be used as is.
    versionRange="[1.1.0,2.0.0)"
    ordering="BEFORE"
    side="BOTH"
+[[dependencies.shoppy]]
+   modId="epherolib"
+   mandatory=true
+   versionRange="[0.1.2,)"
+   ordering="BEFORE"
+   side="BOTH"

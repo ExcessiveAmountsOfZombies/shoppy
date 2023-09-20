@@ -1,8 +1,8 @@
 import net.fabricmc.loom.task.RemapJarTask
 
 plugins {
-    id 'fabric-loom' version '1.0-SNAPSHOT'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'fabric-loom' version '1.2-SNAPSHOT'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 version = project.modVersion
@@ -36,6 +36,7 @@ dependencies {
 
     modImplementation(include("me.lucko:fabric-permissions-api:0.1-SNAPSHOT"))
     modImplementation(include("com.epherical.octo-economy-api:OctoEconomyApi-fabric:1.0.1-1.18.2"))
+    modImplementation('com.epherical.epherolib:EpheroLib-fabric:1.0.0-1.20.1')
 
     modImplementation "net.fabricmc:fabric-loader:${project.fabricLoaderVersion}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabricAPIVersion}"

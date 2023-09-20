@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 
 @Environment(EnvType.CLIENT)
 public class FabricClient extends ShoppyClient implements ClientModInitializer {
@@ -32,10 +33,10 @@ public class FabricClient extends ShoppyClient implements ClientModInitializer {
         BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.SHOP_BLOCK, RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.CREATIVE_BARTERING_STATION, RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.CREATIVE_SHOP_BLOCK, RenderType.cutout());
-        BlockEntityRendererRegistry.register(ShoppyMod.BARTING_STATION_ENTITY, BarteringBlockRenderer::new);
-        BlockEntityRendererRegistry.register(ShoppyMod.SHOP_BLOCK_ENTITY, ShopBlockRenderer::new);
-        BlockEntityRendererRegistry.register(ShoppyMod.CREATIVE_BARTERING_STATION_ENTITY, BarteringBlockRenderer::new);
-        BlockEntityRendererRegistry.register(ShoppyMod.CREATIVE_SHOP_BLOCK_ENTITY, ShopBlockRenderer::new);
+        BlockEntityRenderers.register(ShoppyMod.BARTING_STATION_ENTITY, BarteringBlockRenderer::new);
+        BlockEntityRenderers.register(ShoppyMod.SHOP_BLOCK_ENTITY, ShopBlockRenderer::new);
+        BlockEntityRenderers.register(ShoppyMod.CREATIVE_BARTERING_STATION_ENTITY, BarteringBlockRenderer::new);
+        BlockEntityRenderers.register(ShoppyMod.CREATIVE_SHOP_BLOCK_ENTITY, ShopBlockRenderer::new);
 
         MenuScreens.register(ShoppyMod.BARTERING_MENU, BarteringScreen::new);
         MenuScreens.register(ShoppyMod.BARTERING_MENU_OWNER, BarteringScreenOwner::new);

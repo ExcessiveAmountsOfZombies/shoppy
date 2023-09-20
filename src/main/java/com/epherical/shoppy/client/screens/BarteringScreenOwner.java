@@ -7,6 +7,7 @@ import com.epherical.shoppy.client.widget.SmallIconButton;
 import com.epherical.shoppy.menu.bartering.BarteringMenuOwner;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -71,22 +72,20 @@ public class BarteringScreenOwner extends AbstractContainerScreen<BarteringMenuO
     }
 
     @Override
-    public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-        this.renderBackground(pPoseStack);
-        super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-        this.renderTooltip(pPoseStack, pMouseX, pMouseY);
+    public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
+        this.renderBackground(graphics);
+        super.render(graphics, pMouseX, pMouseY, pPartialTick);
+        this.renderTooltip(graphics, pMouseX, pMouseY);
     }
 
     @Override
-    protected void renderBg(PoseStack pPoseStack, float pPartialTick, int pMouseX, int pMouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, CONTAINER_BACKGROUND);
+    protected void renderBg(GuiGraphics graphics, float pPartialTick, int pMouseX, int pMouseY) {
+        graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
         int left = leftPos;
         int top = topPos;
-        this.blit(pPoseStack, left, top, 0, 0, 176, 147);
-        drawString(pPoseStack, font, "Stored", leftPos + 10, topPos + 50, 0xFFFFFF);
-        drawString(pPoseStack, font, "Stored", leftPos + 132, topPos + 54, 0xFFFFFF);
+        graphics.blit(CONTAINER_BACKGROUND, left, top, 0,0, 176, 147);
+        graphics.drawString(font, "Stored", leftPos + 10, topPos + 50, 0xFFFFFF);
+        graphics.drawString(font, "Stored", leftPos + 132, topPos + 54, 0xFFFFFF);
         //this.blit(pPoseStack, left + 79, top + 34, 0, 126, this.imageWidth, 16);
     }
 }

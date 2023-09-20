@@ -135,7 +135,11 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
     @Override
     public boolean attemptPurchase(Player player, boolean creativeBlock) {
         Inventory inventory = player.getInventory();
-        ItemStack currencyInHand = inventory.getItem(inventory.findSlotMatchingItem(currency));
+        ItemStack currencyInHand = ItemStack.EMPTY;
+        try {
+            currencyInHand = inventory.getItem(inventory.findSlotMatchingItem(currency));
+        } catch (ArrayIndexOutOfBoundsException ignored) {}
+
         Player owner = level.getServer().getPlayerList().getPlayer(this.owner);
         if (ItemStack.isSameItemSameTags(currencyInHand, currency)) {
             int price = currency.getCount();
@@ -249,7 +253,8 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
             return InteractionResult.SUCCESS;
         }
 
-        boolean sameItem = this.getCurrency().sameItem(item);
+
+        boolean sameItem = ItemStack.isSameItemSameTags(this.getCurrency(), item);
         if (hit.y() <= 0.5 && (this.getCurrency().isEmpty() || sameItem)) {
             if (item.getCount() == 1 && sameItem) {
                 if (currency.getCount() < currency.getMaxStackSize())

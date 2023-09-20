@@ -3,12 +3,9 @@ package com.epherical.shoppy.client.widget;
 import com.epherical.shoppy.client.screens.BarteringScreenOwner;
 import com.epherical.shoppy.objects.Action;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,19 +23,25 @@ public class SmallIconButton extends Button {
     }
 
     @Override
-    public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        Minecraft minecraft = Minecraft.getInstance();
-        Font font = minecraft.font;
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, BarteringScreenOwner.CONTAINER_BACKGROUND);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, this.alpha);
-        int i = this.getYImage(this.isHoveredOrFocused());
+    public void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        graphics.setColor(1.0F, 1.0F, 1.0F, this.alpha);
         RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
         RenderSystem.enableDepthTest();
+        int offset = this.getTextureY();
+        graphics.blit(BarteringScreenOwner.CONTAINER_BACKGROUND, getX(), getY(), 208, 7 + offset * 9, 9, 9);
+        graphics.blit(BarteringScreenOwner.CONTAINER_BACKGROUND, getX() + 2, getY() + 2, 224, 16 + icon.ordinal() * 5, 5, 5);
+        graphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+    }
 
-        this.blit(poseStack, getX(), getY(), 208,7 + i * 9, 9, 9);
-        this.blit(poseStack, getX() + 2, getY() + 2, 224, 16 + icon.ordinal() * 5, 5, 5);
+    private int getTextureY() {
+        int offset = 1;
+        if (!this.active) {
+            offset = 0;
+        } else if (this.isHovered()) {
+            offset = 2;
+        }
+
+        return offset;
     }
 
     public static Builder buttonBuilder(@NotNull Component component, Button.@NotNull OnPress press) {

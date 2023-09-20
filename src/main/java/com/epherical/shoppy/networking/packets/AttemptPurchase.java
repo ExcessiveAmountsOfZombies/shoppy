@@ -1,8 +1,8 @@
 package com.epherical.shoppy.networking.packets;
 
+import com.epherical.epherolib.networking.AbstractNetworking;
 import com.epherical.shoppy.block.entity.AbstractTradingBlockEntity;
 import com.epherical.shoppy.menu.ContainerMenu;
-import com.epherical.shoppy.networking.AbstractNetworking;
 import net.minecraft.server.level.ServerPlayer;
 
 public record AttemptPurchase() {

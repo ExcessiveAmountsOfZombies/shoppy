@@ -10,6 +10,7 @@ import com.epherical.shoppy.networking.packets.SlotManipulation;
 import com.epherical.shoppy.objects.Action;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.MultilineTextField;
@@ -21,6 +22,7 @@ import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 
 public class ShoppingScreenOwner extends AbstractContainerScreen<ShoppingMenuOwner> {
@@ -75,21 +77,18 @@ public class ShoppingScreenOwner extends AbstractContainerScreen<ShoppingMenuOwn
     }
 
     @Override
-    public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-        this.renderBackground(pPoseStack);
-        super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-        this.renderTooltip(pPoseStack, pMouseX, pMouseY);
+    public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
+        this.renderBackground(graphics);
+        super.render(graphics, pMouseX, pMouseY, pPartialTick);
+        this.renderTooltip(graphics, pMouseX, pMouseY);
     }
 
     @Override
-    protected void renderBg(PoseStack pPoseStack, float pPartialTick, int pMouseX, int pMouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+    protected void renderBg(GuiGraphics guiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, CONTAINER_BACKGROUND);
         int left = leftPos;
         int top = topPos;
-        this.blit(pPoseStack, left, top, 0, 0, 176, 147);
-        drawString(pPoseStack, font, "Stored", leftPos + 10, topPos + 50, 0xFFFFFF);
-        //this.blit(pPoseStack, left + 79, top + 34, 0, 126, this.imageWidth, 16);
+        guiGraphics.blit(CONTAINER_BACKGROUND, left, top, 0, 0, 176, 147);
+        guiGraphics.drawString(font, "Stored", leftPos + 10, topPos + 50, 0xFFFFFF);
     }
 }

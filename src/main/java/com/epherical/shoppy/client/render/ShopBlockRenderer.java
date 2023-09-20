@@ -60,11 +60,11 @@ public class ShopBlockRenderer<T extends ShopBlockEntity> implements BlockEntity
         } else {
             msg = "Selling x";
         }
-        this.font.drawInBatch(msg + blockEntity.getSelling().getCount(), 0, 0, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
-        this.font.drawInBatch("for", 20, 14, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
+        this.font.drawInBatch(msg + blockEntity.getSelling().getCount(), 0,0,0, false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
+        this.font.drawInBatch("for", 20, 14, 0, false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
         String money = "" + blockEntity.getPrice();
         int width = this.font.width(money);
-        this.font.drawInBatch(money, 26 - (width / 2.0f), 32, 0, false, poseStack.last().pose(), multiBufferSource, false, 0, i);
+        this.font.drawInBatch(money, 26 - (width / 2.0f), 32, 0, false, poseStack.last().pose(), multiBufferSource, Font.DisplayMode.NORMAL, 0, i);
 
         poseStack.popPose();
         poseStack.popPose();

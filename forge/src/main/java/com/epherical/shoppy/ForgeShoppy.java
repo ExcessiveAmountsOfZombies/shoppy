@@ -1,5 +1,6 @@
 package com.epherical.shoppy;
 
+import com.epherical.epherolib.networking.ForgeNetworking;
 import com.epherical.octoecon.api.event.EconomyChangeEvent;
 import com.epherical.shoppy.block.BarteringBlock;
 import com.epherical.shoppy.block.CreativeBarteringBlock;
@@ -19,11 +20,11 @@ import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -33,11 +34,8 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -62,7 +60,6 @@ public class ForgeShoppy extends ShoppyMod {
     public static final PermissionNode<Boolean> ADMIN_BREAK = new PermissionNode<>("shoppy", "admin.break_shop", PermissionTypes.BOOLEAN, (player, playerUUID, context) -> {
         return player != null && player.hasPermissions(4);
     });
-    public static CreativeModeTab ITEM_GROUP;
 
     public ForgeShoppy() {
         super(new ForgeNetworking(MOD_CHANNEL, "1", s -> true, s -> true));
@@ -104,7 +101,7 @@ public class ForgeShoppy extends ShoppyMod {
         if (FMLEnvironment.dist.isDedicatedServer()) {
             Player player = event.getEntity();
             BlockPos pos = event.getPos();
-            ServerLevel level = (ServerLevel) event.getEntity().getLevel();
+            ServerLevel level = (ServerLevel) event.getEntity().level();
             BlockEntity entity = level.getBlockEntity(pos);
             if (entity instanceof AbstractTradingBlockEntity trading) {
                 if ((!trading.getOwner().equals(player.getUUID())) && (!player.hasPermissions(4) || PermissionAPI.getPermission((ServerPlayer) player, ADMIN_BREAK))) {
@@ -117,33 +114,26 @@ public class ForgeShoppy extends ShoppyMod {
     @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class RegistryEvents {
 
-
         @SubscribeEvent
-        public static void registerTab(CreativeModeTabEvent.Register event) {
-            event.registerCreativeModeTab(new ResourceLocation("shoppy", "shoppy_group"), builder -> {
-                builder.title(Component.translatable("itemGroup.shoppy"))
-                        .displayItems((featureFlagSet, output, bl) ->
+        public static void registerEvent(RegisterEvent event) {
+            if (event.getRegistryKey().equals(ForgeRegistries.Keys.MENU_TYPES)) {
+                BARTERING_MENU = new MenuType<>((pContainerId, pPlayerInventory) -> new BarteringMenu(BARTERING_MENU, pContainerId, pPlayerInventory), FeatureFlags.VANILLA_SET);
+                BARTERING_MENU_OWNER = new MenuType<>((pContainerId, pPlayerInventory) -> new BarteringMenuOwner(BARTERING_MENU_OWNER, pContainerId, pPlayerInventory), FeatureFlags.VANILLA_SET);
+                SHOPPING_MENU = new MenuType<>((pContainerId, pPlayerInventory) -> new ShoppingMenu(SHOPPING_MENU, pContainerId, pPlayerInventory), FeatureFlags.VANILLA_SET);
+                SHOPPING_MENU_OWNER = new MenuType<>((pContainerId, pPlayerInventory) -> new ShoppingMenuOwner(SHOPPING_MENU_OWNER, pContainerId, pPlayerInventory), FeatureFlags.VANILLA_SET);
+                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "bartering_menu"), () -> BARTERING_MENU);
+                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "bartering_menu_owner"), () -> BARTERING_MENU_OWNER);
+                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "shopping_menu"), () -> SHOPPING_MENU);
+                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "shopping_menu_owner"), () -> SHOPPING_MENU_OWNER);
+            }
+            if (event.getRegistryKey().equals(ForgeRegistries.Keys.ITEMS)) {
+                CreativeModeTab.builder().title(Component.translatable("itemGroup.shoppy"))
+                        .displayItems((featureFlagSet, output) ->
                                 BuiltInRegistries.ITEM.entrySet().stream()
                                         .filter(entry -> entry.getKey().location().getNamespace().equals("shoppy"))
                                         .sorted(Comparator.comparing(entry -> BuiltInRegistries.ITEM.getId(entry.getValue())))
                                         .forEach(entry -> output.accept(entry.getValue())))
                         .icon(() -> new ItemStack(BARTING_STATION_ITEM));
-            });
-        }
-
-        @SubscribeEvent
-        public static void registerEvent(RegisterEvent event) {
-            if (event.getRegistryKey().equals(ForgeRegistries.Keys.MENU_TYPES)) {
-                BARTERING_MENU = new MenuType<>((pContainerId, pPlayerInventory) -> new BarteringMenu(BARTERING_MENU, pContainerId, pPlayerInventory));
-                BARTERING_MENU_OWNER = new MenuType<>((pContainerId, pPlayerInventory) -> new BarteringMenuOwner(BARTERING_MENU_OWNER, pContainerId, pPlayerInventory));
-                SHOPPING_MENU = new MenuType<>((pContainerId, pPlayerInventory) -> new ShoppingMenu(SHOPPING_MENU, pContainerId, pPlayerInventory));
-                SHOPPING_MENU_OWNER = new MenuType<>((pContainerId, pPlayerInventory) -> new ShoppingMenuOwner(SHOPPING_MENU_OWNER, pContainerId, pPlayerInventory));
-                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "bartering_menu"), () -> BARTERING_MENU);
-                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "bartering_menu_owner"), () -> BARTERING_MENU_OWNER);
-                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "shopping_menu"), () ->SHOPPING_MENU);
-                event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "shopping_menu_owner"), () -> SHOPPING_MENU_OWNER);
-            }
-            if (event.getRegistryKey().equals(ForgeRegistries.Keys.ITEMS)) {
                 BARTING_STATION_ITEM = new BlockItem(BARTERING_STATION, new Item.Properties());
                 SHOP_BLOCK_ITEM = new BlockItem(SHOP_BLOCK, new Item.Properties());
                 CREATIVE_BARTERING_STATION_ITEM = new BlockItem(CREATIVE_BARTERING_STATION, new Item.Properties());
@@ -154,13 +144,13 @@ public class ForgeShoppy extends ShoppyMod {
                 event.register(ForgeRegistries.Keys.ITEMS, new ResourceLocation("shoppy", "creative_bartering_station"), () -> CREATIVE_BARTERING_STATION_ITEM);
                 event.register(ForgeRegistries.Keys.ITEMS, new ResourceLocation("shoppy", "creative_shop_block"), () -> CREATIVE_SHOP_BLOCK_ITEM);
             } else if (event.getRegistryKey().equals(ForgeRegistries.Keys.BLOCKS)) {
-                BARTERING_STATION = new BarteringBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F, 1200F)
+                BARTERING_STATION = new BarteringBlock(BlockBehaviour.Properties.of().strength(2.5F, 1200F)
                         .sound(SoundType.WOOD).noOcclusion());
-                SHOP_BLOCK = new ShopBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F, 1200F)
+                SHOP_BLOCK = new ShopBlock(BlockBehaviour.Properties.of().strength(2.5F, 1200F)
                         .sound(SoundType.WOOD).noOcclusion(), false);
-                CREATIVE_BARTERING_STATION = new CreativeBarteringBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F, 1200F)
+                CREATIVE_BARTERING_STATION = new CreativeBarteringBlock(BlockBehaviour.Properties.of().strength(2.5F, 1200F)
                         .sound(SoundType.WOOD).noOcclusion());
-                CREATIVE_SHOP_BLOCK = new CreativeShopBlock(BlockBehaviour.Properties.of(Material.WOOD).strength(2.5F, 1200F)
+                CREATIVE_SHOP_BLOCK = new CreativeShopBlock(BlockBehaviour.Properties.of().strength(2.5F, 1200F)
                         .sound(SoundType.WOOD).noOcclusion(), true);
                 event.register(ForgeRegistries.Keys.BLOCKS, new ResourceLocation("shoppy", "bartering_station"), () -> BARTERING_STATION);
                 event.register(ForgeRegistries.Keys.BLOCKS, new ResourceLocation("shoppy", "shop_block"), () -> SHOP_BLOCK);
