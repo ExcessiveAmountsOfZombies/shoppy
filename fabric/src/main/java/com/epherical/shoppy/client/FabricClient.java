@@ -3,6 +3,7 @@ package com.epherical.shoppy.client;
 import com.epherical.shoppy.ShoppyMod;
 import com.epherical.shoppy.client.render.BarteringBlockRenderer;
 import com.epherical.shoppy.client.render.ShopBlockRenderer;
+import com.epherical.shoppy.client.render.ShoppyItemRenderer;
 import com.epherical.shoppy.client.screens.BarteringScreen;
 import com.epherical.shoppy.client.screens.BarteringScreenOwner;
 import com.epherical.shoppy.client.screens.ShoppingScreen;
@@ -13,9 +14,12 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 
 @Environment(EnvType.CLIENT)
 public class FabricClient extends ShoppyClient implements ClientModInitializer {
@@ -29,6 +33,7 @@ public class FabricClient extends ShoppyClient implements ClientModInitializer {
                 tick = Integer.MIN_VALUE;
             }
         });
+
         BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.BARTERING_STATION, RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.SHOP_BLOCK, RenderType.cutout());
         BlockRenderLayerMap.INSTANCE.putBlock(ShoppyMod.CREATIVE_BARTERING_STATION, RenderType.cutout());

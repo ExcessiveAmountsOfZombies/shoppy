@@ -10,6 +10,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -20,9 +21,12 @@ public class ShopBlockRenderer<T extends ShopBlockEntity> implements BlockEntity
     private final Font font;
     private ItemEntity sellingItem;
 
+    private ShoppyItemRenderer customRenderer;
+
     public ShopBlockRenderer(BlockEntityRendererProvider.Context context) {
         this.renderer = Minecraft.getInstance().getItemRenderer();
         this.font = context.getFont();
+        this.customRenderer = new ShoppyItemRenderer(new EntityRendererProvider.Context(context.getEntityRenderer(), this.renderer, context.getBlockRenderDispatcher(), null, null, context.getModelSet(), Minecraft.getInstance().font));
     }
 
     @Override
@@ -38,7 +42,7 @@ public class ShopBlockRenderer<T extends ShopBlockEntity> implements BlockEntity
         poseStack.scale(0.60F, 0.60F, 0.60F);
         sellingItem.setItem(blockEntity.getSelling());
         if (sellingItem != null) {
-            Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(sellingItem).render(sellingItem, f, ShoppyClient.tick, poseStack, multiBufferSource, i);
+            this.customRenderer.render(sellingItem, f, ShoppyClient.tick, poseStack, multiBufferSource, i);
         }
 
         poseStack.pushPose();

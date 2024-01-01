@@ -99,7 +99,7 @@ dependencies {
         transitive = false
     }
 
-    implementation(('com.epherical.epherolib:EpheroLib-forge:1.0.0-1.20.1'))
+    implementation(("com.epherical.epherolib:EpheroLib-forge:${project.epherolibVersion}"))
     implementation("com.epherical.octo-economy-api:OctoEconomyApi-forge:1.1.0-1.18.2")
     implementation(fg.deobf("curse.maven:project-559967:4007963"))
     annotationProcessor "org.spongepowered:mixin:${mixinVersion}:processor"
