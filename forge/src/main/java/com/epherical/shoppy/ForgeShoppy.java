@@ -133,7 +133,8 @@ public class ForgeShoppy extends ShoppyMod {
                                         .filter(entry -> entry.getKey().location().getNamespace().equals("shoppy"))
                                         .sorted(Comparator.comparing(entry -> BuiltInRegistries.ITEM.getId(entry.getValue())))
                                         .forEach(entry -> output.accept(entry.getValue())))
-                        .icon(() -> new ItemStack(BARTING_STATION_ITEM));
+                        .icon(() -> new ItemStack(BARTING_STATION_ITEM))
+                        .build();
                 BARTING_STATION_ITEM = new BlockItem(BARTERING_STATION, new Item.Properties());
                 SHOP_BLOCK_ITEM = new BlockItem(SHOP_BLOCK, new Item.Properties());
                 CREATIVE_BARTERING_STATION_ITEM = new BlockItem(CREATIVE_BARTERING_STATION, new Item.Properties());

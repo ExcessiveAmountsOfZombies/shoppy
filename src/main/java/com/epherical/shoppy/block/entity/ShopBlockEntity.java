@@ -2,9 +2,11 @@ package com.epherical.shoppy.block.entity;
 
 import com.epherical.octoecon.api.user.UniqueUser;
 import com.epherical.shoppy.ShoppyMod;
+import com.epherical.shoppy.menu.bartering.BarteringMenu;
 import com.epherical.shoppy.menu.shopping.ShoppingMenu;
 import com.epherical.shoppy.menu.shopping.ShoppingMenuOwner;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -27,6 +29,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
+import static com.epherical.shoppy.menu.bartering.BarteringMenu.CURRENCY_STORED;
 import static com.epherical.shoppy.menu.shopping.ShoppingMenu.SELLING_STORED;
 
 public class ShopBlockEntity extends AbstractTradingBlockEntity {
@@ -444,5 +447,32 @@ public class ShopBlockEntity extends AbstractTradingBlockEntity {
         return true;
     }
 
+    private static final int[] SLOTS_FOR_REST = new int[]{SELLING_STORED};
 
+    @Override
+    public int[] getSlotsForFace(Direction direction) {
+        if (direction == Direction.DOWN) {
+            return new int[]{};
+        } else {
+            return SLOTS_FOR_REST;
+        }
+    }
+
+    /**
+     * this is not how this was meant to be used.
+     */
+    @Override
+    public boolean canPlaceItemThroughFace(int i, ItemStack itemStack, @Nullable Direction direction) {
+        if (storedSellingItems <= maxStorage && i == SELLING_STORED && direction != null && direction != Direction.DOWN
+                && ItemStack.isSameItemSameTags(itemStack, selling)) {
+            setItem(i, itemStack);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int i, ItemStack itemStack, Direction direction) {
+        return false;
+    }
 }

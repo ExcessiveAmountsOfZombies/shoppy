@@ -4,6 +4,7 @@ import com.epherical.shoppy.menu.bartering.BarteringMenu;
 import com.epherical.shoppy.ShoppyMod;
 import com.epherical.shoppy.block.AbstractTradingBlock;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -32,6 +33,9 @@ import static com.epherical.shoppy.menu.bartering.BarteringMenu.SELLING_STORED;
 import static com.epherical.shoppy.menu.bartering.BarteringMenuOwner.*;
 
 public class BarteringBlockEntity extends AbstractTradingBlockEntity {
+
+    private static final int[] SLOTS_FOR_DOWN = new int[]{CURRENCY_STORED};
+    private static final int[] SLOTS_FOR_REST = new int[]{SELLING_STORED};
 
     ItemStack currency;
     int currencyStored;
@@ -417,6 +421,8 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
             currency = stack;
         } else if (slot == SOLD_ITEMS) {
             selling = stack;
+        } else if (slot == SELLING_STORED) {
+            storedSellingItems += stack.getCount();
         }
 
         markUpdated();
@@ -425,5 +431,36 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
     @Override
     public boolean stillValid(Player player) {
         return true;
+    }
+
+
+    @Override
+    public int[] getSlotsForFace(Direction direction) {
+        if (direction == Direction.DOWN) {
+            return SLOTS_FOR_DOWN;
+        } else {
+            return SLOTS_FOR_REST;
+        }
+    }
+
+    /**
+     * this is not how this was meant to be used.
+     */
+    @Override
+    public boolean canPlaceItemThroughFace(int i, ItemStack itemStack, @Nullable Direction direction) {
+        if (storedSellingItems <= maxStorage && i == SELLING_STORED && direction != null && direction != Direction.DOWN
+                && ItemStack.isSameItemSameTags(itemStack, selling)) {
+            setItem(i, itemStack);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int i, ItemStack itemStack, Direction direction) {
+        if (direction == Direction.DOWN && i == CURRENCY_STORED) {
+            return true;
+        }
+        return false;
     }
 }
