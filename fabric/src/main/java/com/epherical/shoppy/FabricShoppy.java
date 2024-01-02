@@ -61,6 +61,8 @@ public class FabricShoppy extends ShoppyMod implements ModInitializer {
     public void onInitialize() {
         int value = 0;
 
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, new ResourceLocation("shoppy", "shoppy"), SHOPPY_ITEM_GROUP);
+
         BARTERING_STATION = Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation("shoppy", "bartering_station"),
                 new BarteringBlock(BlockBehaviour.Properties.of().strength(2.5F, 1200F).sound(SoundType.WOOD).noOcclusion()));
         BARTING_STATION_ITEM = Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("shoppy", "bartering_station"),

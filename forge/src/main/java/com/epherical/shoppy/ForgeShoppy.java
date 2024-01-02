@@ -18,7 +18,9 @@ import com.epherical.shoppy.menu.shopping.ShoppingMenuOwner;
 import net.minecraft.Util;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -127,14 +129,14 @@ public class ForgeShoppy extends ShoppyMod {
                 event.register(ForgeRegistries.Keys.MENU_TYPES, new ResourceLocation("shoppy", "shopping_menu_owner"), () -> SHOPPING_MENU_OWNER);
             }
             if (event.getRegistryKey().equals(ForgeRegistries.Keys.ITEMS)) {
-                CreativeModeTab.builder().title(Component.translatable("itemGroup.shoppy"))
+                Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, new ResourceLocation("shoppy", "shoppy"), CreativeModeTab.builder().title(Component.translatable("itemGroup.shoppy"))
                         .displayItems((featureFlagSet, output) ->
                                 BuiltInRegistries.ITEM.entrySet().stream()
                                         .filter(entry -> entry.getKey().location().getNamespace().equals("shoppy"))
                                         .sorted(Comparator.comparing(entry -> BuiltInRegistries.ITEM.getId(entry.getValue())))
                                         .forEach(entry -> output.accept(entry.getValue())))
                         .icon(() -> new ItemStack(BARTING_STATION_ITEM))
-                        .build();
+                        .build());
                 BARTING_STATION_ITEM = new BlockItem(BARTERING_STATION, new Item.Properties());
                 SHOP_BLOCK_ITEM = new BlockItem(SHOP_BLOCK, new Item.Properties());
                 CREATIVE_BARTERING_STATION_ITEM = new BlockItem(CREATIVE_BARTERING_STATION, new Item.Properties());
