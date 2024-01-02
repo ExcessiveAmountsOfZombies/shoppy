@@ -75,28 +75,6 @@ public class DenseContainer implements Container {
         return itemstack;
     }
 
-    public ItemStack removeItemType(Item pItem, int pAmount) {
-        ItemStack itemstack = new ItemStack(pItem, 0);
-
-        for(int i = this.size - 1; i >= 0; --i) {
-            ItemStack itemstack1 = this.getItem(i);
-            if (itemstack1.getItem().equals(pItem)) {
-                int j = pAmount - itemstack.getCount();
-                ItemStack itemstack2 = itemstack1.split(j);
-                itemstack.grow(itemstack2.getCount());
-                if (itemstack.getCount() == pAmount) {
-                    break;
-                }
-            }
-        }
-
-        if (!itemstack.isEmpty()) {
-            this.setChanged();
-        }
-
-        return itemstack;
-    }
-
     public ItemStack addItem(ItemStack pStack) {
         ItemStack itemstack = pStack.copy();
         this.moveItemToOccupiedSlotsWithSameType(itemstack);

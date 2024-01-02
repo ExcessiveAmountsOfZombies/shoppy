@@ -35,7 +35,7 @@ import static com.epherical.shoppy.menu.bartering.BarteringMenuOwner.*;
 public class BarteringBlockEntity extends AbstractTradingBlockEntity {
 
     private static final int[] SLOTS_FOR_DOWN = new int[]{CURRENCY_STORED};
-    private static final int[] SLOTS_FOR_REST = new int[]{SELLING_STORED};
+    private static final int[] SLOTS_FOR_REST = new int[]{4};
 
     ItemStack currency;
     int currencyStored;
@@ -386,6 +386,13 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
         } else if (pSlot == SOLD_ITEMS) {
             item = getSelling();
             take = getSelling().getCount();
+        } else if (pSlot == 4) {
+            if (storedSellingItems < maxStorage) {
+                take = 1;
+            } else {
+                take = storedSellingItems;
+            }
+            item = getSelling().copy();
         } else {
             return ItemStack.EMPTY;
         }
@@ -421,7 +428,7 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
             currency = stack;
         } else if (slot == SOLD_ITEMS) {
             selling = stack;
-        } else if (slot == SELLING_STORED) {
+        } else if (slot == SELLING_STORED || slot == 4) {
             storedSellingItems += stack.getCount();
         }
 
@@ -448,7 +455,7 @@ public class BarteringBlockEntity extends AbstractTradingBlockEntity {
      */
     @Override
     public boolean canPlaceItemThroughFace(int i, ItemStack itemStack, @Nullable Direction direction) {
-        if (storedSellingItems <= maxStorage && i == SELLING_STORED && direction != null && direction != Direction.DOWN
+        if (storedSellingItems <= maxStorage && i == SELLING_STORED || i == 4 && direction != null && direction != Direction.DOWN
                 && ItemStack.isSameItemSameTags(itemStack, selling)) {
             setItem(i, itemStack);
             return true;

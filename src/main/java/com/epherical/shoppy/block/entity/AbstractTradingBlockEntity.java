@@ -167,4 +167,9 @@ public abstract class AbstractTradingBlockEntity extends BaseContainerBlockEntit
     public int remainingItemStorage() {
         return maxStorage - storedSellingItems;
     }
+
+    @Override
+    public int getMaxStackSize() {
+        return maxStorage;
+    }
 }
