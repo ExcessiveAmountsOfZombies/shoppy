@@ -37,7 +37,7 @@ while bartering can be used as is.
 [[dependencies.shoppy]]
    modId="octo_economy_api"
    mandatory=true
-   versionRange="[1.1.0,2.0.0)"
+   versionRange="[1.0.1,2.0.0)"
    ordering="BEFORE"
    side="BOTH"
 [[dependencies.shoppy]]

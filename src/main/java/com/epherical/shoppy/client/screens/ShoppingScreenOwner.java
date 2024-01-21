@@ -10,6 +10,7 @@ import com.epherical.shoppy.networking.packets.SlotManipulation;
 import com.epherical.shoppy.objects.Action;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -20,6 +21,7 @@ import net.minecraft.client.gui.screens.DirectJoinServerScreen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
@@ -38,28 +40,29 @@ public class ShoppingScreenOwner extends AbstractContainerScreen<ShoppingMenuOwn
     @Override
     protected void init() {
         super.init();
+        Connection connection = Minecraft.getInstance().getConnection().getConnection();
         // Middle blue slot top/bottom
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Up"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.INSERTED_ITEM, Action.INCREMENT));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.INSERTED_ITEM, Action.INCREMENT), connection);
         }).pos(leftPos + 74, topPos + 20).setIcon(Action.Icon.INCREMENT).build());
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Down"),var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.INSERTED_ITEM, Action.DECREMENT));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.INSERTED_ITEM, Action.DECREMENT), connection);
         }).pos(leftPos + 75, topPos + 50).setIcon(Action.Icon.DECREMENT).build());
 
         // Left blue remove "money" gained.
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Remove Stack"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.SELLING_STORED, Action.REMOVE_STACK));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.SELLING_STORED, Action.REMOVE_STACK), connection);
         }).pos(leftPos + 8, topPos + 30).setIcon(Action.Icon.DECREMENT).tooltip(Tooltip.create(Component.nullToEmpty("Remove a slot of items"))).build());
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Remove as much as possible"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.SELLING_STORED, Action.REMOVE_ALL));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.SELLING_STORED, Action.REMOVE_ALL), connection);
         }).pos(leftPos + 8, topPos + 40).setIcon(Action.Icon.DECREMENT).tooltip(Tooltip.create(Component.nullToEmpty("Remove all available items"))).build());
 
         // Right orange, insert items
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Insert Stack"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.SELLING_STORED, Action.INSERT_SLOT));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.SELLING_STORED, Action.INSERT_SLOT), connection);
         }).pos(leftPos + 37, topPos + 30).setIcon(Action.Icon.INCREMENT).tooltip(Tooltip.create(Component.nullToEmpty("Insert a stack."))).build());
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Insert as much as possible"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.SELLING_STORED, Action.INSERT_ALL));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(ShoppingMenuOwner.SELLING_STORED, Action.INSERT_ALL), connection);
         }).pos(leftPos + 37, topPos + 40).setIcon(Action.Icon.INCREMENT).tooltip(Tooltip.create(Component.nullToEmpty("Insert all available items"))).build());
 
         EditBox box = new EditBox(font, leftPos + 96, topPos + 14, 74, 20, Component.nullToEmpty("Set Price"));
@@ -69,7 +72,7 @@ public class ShoppingScreenOwner extends AbstractContainerScreen<ShoppingMenuOwn
         this.addRenderableWidget(Button.builder(Component.nullToEmpty("Set Price"), var1 -> {
             try {
                 int i = Integer.parseInt(box.getValue());
-                ShoppyMod.MOD.getNetworking().sendToServer(new SetPrice(i));
+                ShoppyMod.MOD.getNetworking().sendToServer(new SetPrice(i), connection);
             } catch (NumberFormatException ignored) {
                 // todo; error message appear on screen
             }
@@ -78,7 +81,7 @@ public class ShoppingScreenOwner extends AbstractContainerScreen<ShoppingMenuOwn
 
     @Override
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-        this.renderBackground(graphics);
+        this.renderBackground(graphics, pMouseX, pMouseY, pPartialTick);
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
         this.renderTooltip(graphics, pMouseX, pMouseY);
     }

@@ -43,8 +43,8 @@ minecraft {
 dependencies {
     compileOnly group:'org.spongepowered', name:'mixin', version: mixinVersion
     compileOnlyApi("org.jetbrains:annotations:${project.JBAnnotationsVersion}")
-    implementation('com.epherical.octo-economy-api:OctoEconomyApi:1.0.1-1.18.2')
-    compileOnlyApi('com.epherical.epherolib:EpheroLib:1.0.0-1.20.1')
+    implementation('com.epherical.octo-economy-api:OctoEconomyApi:1.1.0-1.18.2')
+    compileOnlyApi("com.epherical.epherolib:EpheroLib:${project.epherolibVersion}")
 }
 
 sourceSets {

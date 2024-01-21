@@ -42,10 +42,10 @@ import java.util.UUID;
 
 public abstract class ShoppyMod {
 
-    public static final Style CONSTANTS_STYLE = Style.EMPTY.withColor(TextColor.parseColor("#999999"));
-    public static final Style VARIABLE_STYLE = Style.EMPTY.withColor(TextColor.parseColor("#ffd500"));
-    public static final Style APPROVAL_STYLE = Style.EMPTY.withColor(TextColor.parseColor("#6ba4ff"));
-    public static final Style ERROR_STYLE = Style.EMPTY.withColor(TextColor.parseColor("#b31717"));
+    public static final Style CONSTANTS_STYLE = Style.EMPTY.withColor(TextColor.fromRgb(0x999999));
+    public static final Style VARIABLE_STYLE = Style.EMPTY.withColor(TextColor.fromRgb(0xffd500));
+    public static final Style APPROVAL_STYLE = Style.EMPTY.withColor(TextColor.fromRgb(0x6ba4ff));
+    public static final Style ERROR_STYLE = Style.EMPTY.withColor(TextColor.fromRgb(0xb31717));
 
     public static BlockEntityType<BarteringBlockEntity> BARTING_STATION_ENTITY;
     public static AbstractTradingBlock BARTERING_STATION;

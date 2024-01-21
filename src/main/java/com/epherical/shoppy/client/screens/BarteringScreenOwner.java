@@ -7,10 +7,12 @@ import com.epherical.shoppy.client.widget.SmallIconButton;
 import com.epherical.shoppy.menu.bartering.BarteringMenuOwner;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -28,52 +30,53 @@ public class BarteringScreenOwner extends AbstractContainerScreen<BarteringMenuO
     @Override
     protected void init() {
         super.init();
+        Connection connection = Minecraft.getInstance().getConnection().getConnection();
         // Middle blue slot top/bottom
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Up"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.CURRENCY_ITEM, Action.INCREMENT));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.CURRENCY_ITEM, Action.INCREMENT), connection);
         }).pos(leftPos + 74, topPos + 20).setIcon(Action.Icon.INCREMENT).build());
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Down"),var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.CURRENCY_ITEM, Action.DECREMENT));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.CURRENCY_ITEM, Action.DECREMENT), connection);
         }).pos(leftPos + 75, topPos + 50).setIcon(Action.Icon.DECREMENT).build());
 
         // Middle orange slot top/bottom
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Up"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SOLD_ITEMS, Action.INCREMENT));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SOLD_ITEMS, Action.INCREMENT), connection);
         }).pos(leftPos + 93, topPos + 20).setIcon(Action.Icon.INCREMENT).build());
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Down"),var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SOLD_ITEMS, Action.DECREMENT));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SOLD_ITEMS, Action.DECREMENT), connection);
         }).pos(leftPos + 92, topPos + 50).setIcon(Action.Icon.DECREMENT).build());
 
 
         // Right orange, insert items
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Insert Stack"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SELLING_STORED, Action.INSERT_SLOT));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SELLING_STORED, Action.INSERT_SLOT), connection);
         }).pos(leftPos + 165, topPos + 30).setIcon(Action.Icon.INCREMENT).tooltip(Tooltip.create(Component.nullToEmpty("Insert a stack."))).build());
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Insert as much as possible"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SELLING_STORED, Action.INSERT_ALL));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SELLING_STORED, Action.INSERT_ALL), connection);
         }).pos(leftPos + 165, topPos + 40).setIcon(Action.Icon.INCREMENT).tooltip(Tooltip.create(Component.nullToEmpty("Insert all available items"))).build());
 
         // Right orange, remove items
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Remove Stack"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SELLING_STORED, Action.REMOVE_STACK));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SELLING_STORED, Action.REMOVE_STACK), connection);
         }).pos(leftPos + 127, topPos + 30).setIcon(Action.Icon.DECREMENT).tooltip(Tooltip.create(Component.nullToEmpty("Remove a stack."))).build());
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Remove as much as possible"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SELLING_STORED, Action.REMOVE_ALL));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.SELLING_STORED, Action.REMOVE_ALL), connection);
         }).pos(leftPos + 127, topPos + 40).setIcon(Action.Icon.DECREMENT).tooltip(Tooltip.create(Component.nullToEmpty("Remove all available items"))).build());
 
         // Left blue remove "money" gained.
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Remove Stack"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.CURRENCY_STORED, Action.REMOVE_STACK));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.CURRENCY_STORED, Action.REMOVE_STACK), connection);
         }).pos(leftPos + 8, topPos + 30).setIcon(Action.Icon.DECREMENT).tooltip(Tooltip.create(Component.nullToEmpty("Remove a slot of items"))).build());
         this.addRenderableWidget(SmallIconButton.buttonBuilder(Component.nullToEmpty("Remove as much as possible"), var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.CURRENCY_STORED, Action.REMOVE_ALL));
+            ShoppyMod.MOD.getNetworking().sendToServer(new SlotManipulation(BarteringMenuOwner.CURRENCY_STORED, Action.REMOVE_ALL), connection);
         }).pos(leftPos + 8, topPos + 40).setIcon(Action.Icon.DECREMENT).tooltip(Tooltip.create(Component.nullToEmpty("Remove all available items"))).build());
 
     }
 
     @Override
     public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-        this.renderBackground(graphics);
+        this.renderBackground(graphics, pMouseX, pMouseY, pPartialTick);
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
         this.renderTooltip(graphics, pMouseX, pMouseY);
     }

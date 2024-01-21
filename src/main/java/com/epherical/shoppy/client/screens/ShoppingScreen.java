@@ -6,11 +6,13 @@ import com.epherical.shoppy.menu.shopping.ShoppingMenu;
 import com.epherical.shoppy.networking.packets.AttemptPurchase;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -33,9 +35,11 @@ public class ShoppingScreen extends AbstractContainerScreen<ShoppingMenu> {
     @Override
     protected void init() {
         super.init();
+        Connection connection = Minecraft.getInstance().getConnection().getConnection();
+
 
         button = this.addRenderableWidget(Button.builder(selling,var1 -> {
-            ShoppyMod.MOD.getNetworking().sendToServer(new AttemptPurchase());
+            ShoppyMod.MOD.getNetworking().sendToServer(new AttemptPurchase(), connection);
         }).size(64, 20).pos(leftPos + 7, topPos + 38).build());
     }
 
@@ -46,7 +50,7 @@ public class ShoppingScreen extends AbstractContainerScreen<ShoppingMenu> {
         } else {
             button.setMessage(selling);
         }
-        this.renderBackground(graphics);
+        this.renderBackground(graphics, pMouseX, pMouseY, pPartialTick);
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
         this.renderTooltip(graphics, pMouseX, pMouseY);
     }
